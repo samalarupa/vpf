@@ -19,6 +19,7 @@ import {
   ArrowUp,
   Sun,
   Moon,
+  Search,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -26,27 +27,27 @@ import { motion, useReducedMotion } from "framer-motion";
    PALETTE / TOKENS (Deep Navy + Champagne Gold + Marble White)
 ------------------------------ */
 const DARK_THEME = {
-  BG: "#0A0E27", // page background
-  SURFACE: "#141B3A", // block/card background
-  ACCENT: "#1A2347", // glass/accent
-  TEXT: "#F8F9FB", // primary text
-  MUTED: "#B8BDD0", // secondary text
-  GOLD: "#D4AF37", // champagne gold
-  GOLD_L: "#E8C875", // lighter gold
-  GOLD_D: "#B8963A", // deeper gold
-  LINE: "#1F2847", // subtle stroke
+  BG: "#0A0E27",
+  SURFACE: "#141B3A",
+  ACCENT: "#1A2347",
+  TEXT: "#F8F9FB",
+  MUTED: "#B8BDD0",
+  GOLD: "#D4AF37",
+  GOLD_L: "#E8C875",
+  GOLD_D: "#B8963A",
+  LINE: "#1F2847",
 };
 
 const LIGHT_THEME = {
-  BG: "#FFFFFF", // page background
-  SURFACE: "#F8F9FA", // block/card background
-  ACCENT: "#EDEFF2", // glass/accent
-  TEXT: "#1A1F36", // primary text
-  MUTED: "#6B7280", // secondary text
-  GOLD: "#D4AF37", // champagne gold
-  GOLD_L: "#E8C875", // lighter gold
-  GOLD_D: "#B8963A", // deeper gold
-  LINE: "#E5E7EB", // subtle stroke
+  BG: "#FFFFFF",
+  SURFACE: "#F8F9FA",
+  ACCENT: "#EDEFF2",
+  TEXT: "#1A1F36",
+  MUTED: "#6B7280",
+  GOLD: "#D4AF37",
+  GOLD_L: "#E8C875",
+  GOLD_D: "#B8963A",
+  LINE: "#E5E7EB",
 };
 
 const fmtLakh = (n) => `₹ ${Number(n).toLocaleString("en-IN")} L`;
@@ -66,6 +67,14 @@ const TESTIMONIALS = [
   ["Naveen M. • LB Nagar", 5, "Great options for families, smooth guidance from shortlist to registration."],
 ];
 
+const HYDERABAD_LOCALITIES = [
+  "Gachibowli", "Banjara Hills", "Jubilee Hills", "Kondapur", "Madhapur", 
+  "HITEC City", "Financial District", "Kokapet", "Nanakramguda", "Manikonda",
+  "Miyapur", "Kukatpally", "Ameerpet", "Secunderabad", "Begumpet"
+];
+
+const POPULAR_LOCALITIES = ["Gachibowli", "Madhapur", "Kukatpally", "Kondapur", "Miyapur"];
+
 /* -----------------------------
    PAGE
 ------------------------------ */
@@ -73,15 +82,19 @@ export default function Home() {
   const prefersReducedMotion = useReducedMotion();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeTab, setActiveTab] = useState("buy");
+  const [propertyType, setPropertyType] = useState("fullHouse");
+  const [bhkType, setBhkType] = useState("");
+  const [propertyStatus, setPropertyStatus] = useState("");
+  const [newBuilder, setNewBuilder] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const theme = isDarkMode ? DARK_THEME : LIGHT_THEME;
 
-  // Scroll to top functionality
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -111,65 +124,49 @@ export default function Home() {
     show:   { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
   };
 
-  // YouTube Video Gallery config
-  const VIDEO_IDS = [
-    "ntWlE3StjWo",
-    "m_jfMBYbKFs",
-    "hVxY2w59Uss",
-    "cV2gBU6hKfY",
-  ];
+  const VIDEO_IDS = ["ntWlE3StjWo", "m_jfMBYbKFs", "hVxY2w59Uss", "cV2gBU6hKfY"];
   const [activeId, setActiveId] = React.useState(VIDEO_IDS[0]);
 
   return (
     <div
-      className="min-h-screen relative transition-colors duration-300"
+      className="min-h-screen relative transition-colors duration-300 overflow-hidden"
       style={{
         backgroundColor: theme.BG,
         color: theme.TEXT,
         backgroundImage: isDarkMode 
-          ? `
-            radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 50%),
-            radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.06), transparent 45%),
-            linear-gradient(180deg, ${theme.BG} 0%, #0D1230 100%)
-          `
-          : `
-            radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.05), transparent 50%),
-            radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.03), transparent 45%),
-            linear-gradient(180deg, ${theme.BG} 0%, #F0F2F5 100%)
-          `,
+          ? `radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 50%),
+             radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.06), transparent 45%),
+             linear-gradient(180deg, ${theme.BG} 0%, #0D1230 100%)`
+          : `radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.05), transparent 50%),
+             radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.03), transparent 45%),
+             linear-gradient(180deg, ${theme.BG} 0%, #F0F2F5 100%)`,
       }}
     >
-      {/* Theme Toggle Button */}
+      {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
         className="fixed top-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-110 shadow-lg"
         style={{
-          backgroundColor: isDarkMode ? `${theme.ACCENT}E6` : `${theme.ACCENT}E6`,
+          backgroundColor: `${theme.ACCENT}E6`,
           border: `1.5px solid ${theme.GOLD}40`,
           color: theme.GOLD,
         }}
-        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
         {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
-      {/* Scroll to Top Button */}
+      {/* Scroll to Top */}
       <motion.button
         onClick={scrollToTop}
-        className="fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all duration-300 shadow-lg"
+        className="fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border shadow-lg"
         style={{
-          backgroundColor: isDarkMode ? `${theme.ACCENT}E6` : `${theme.ACCENT}E6`,
+          backgroundColor: `${theme.ACCENT}E6`,
           border: `1.5px solid ${theme.GOLD}40`,
           color: theme.GOLD,
         }}
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ 
-          opacity: showScrollTop ? 1 : 0,
-          scale: showScrollTop ? 1 : 0.8
-        }}
+        animate={{ opacity: showScrollTop ? 1 : 0, scale: showScrollTop ? 1 : 0.8 }}
         whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.2 }}
-        aria-label="Scroll to top"
       >
         <ArrowUp size={20} />
       </motion.button>
@@ -177,33 +174,296 @@ export default function Home() {
       {/* Ambient glows */}
       {isDarkMode && (
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
-            style={{ background: `radial-gradient(circle, ${theme.GOLD} 0%, transparent 70%)` }}
-          />
-          <div
-            className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
-            style={{ background: `radial-gradient(circle, ${theme.GOLD_L} 0%, transparent 70%)` }}
-          />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
+            style={{ background: `radial-gradient(circle, ${theme.GOLD} 0%, transparent 70%)` }} />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
+            style={{ background: `radial-gradient(circle, ${theme.GOLD_L} 0%, transparent 70%)` }} />
         </div>
       )}
 
+      {/* ================= HERO FILTER SECTION ================= */}
+      <motion.section 
+        className="relative pt-20 pb-12 px-6 min-h-[80vh] flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden opacity-20">
+          {HYDERABAD_LOCALITIES.map((locality, index) => (
+            <motion.div
+              key={locality + index}
+              className="absolute text-2xl font-bold whitespace-nowrap"
+              style={{
+                color: `${theme.GOLD}30`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                x: [0, -1000],
+                opacity: [0, 0.8, 0],
+              }}
+              transition={{
+                duration: 20 + Math.random() * 20,
+                repeat: Infinity,
+                delay: Math.random() * 10,
+                ease: "linear",
+              }}
+            >
+              {locality}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+          {/* Hero Text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-center mb-8"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-4"
+              style={{
+                background: `${theme.ACCENT}80`,
+                border: `1px solid ${theme.GOLD}25`,
+                backdropFilter: "blur(12px)",
+                color: theme.GOLD,
+              }}
+            >
+              <Sparkles size={13} />
+              <span>Premium Properties • Hyderabad</span>
+            </motion.div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
+              <span
+                style={{
+                  background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 50%, ${theme.GOLD_D} 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Find a Home That Truly Fits You
+              </span>
+            </h1>
+
+            <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed font-light mb-6" style={{ color: theme.MUTED }}>
+              Curated luxury homes in Hyderabad's most prestigious neighborhoods
+            </p>
+          </motion.div>
+
+          {/* Filter Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div
+              className="rounded-2xl p-5 backdrop-blur-xl shadow-2xl border"
+              style={{
+                background: isDarkMode 
+                  ? `linear-gradient(135deg, ${theme.SURFACE}F0 0%, ${theme.ACCENT}F0 100%)`
+                  : `${theme.SURFACE}F5`,
+                borderColor: theme.LINE,
+              }}
+            >
+              {/* Tabs */}
+              {/* <div className="flex gap-1 mb-4 border-b pb-3" style={{ borderColor: theme.LINE }}>
+                {[
+                  { id: "buy", label: "Buy" },
+                  { id: "rent", label: "Rent" },
+                  { id: "commercial", label: "Commercial" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="px-5 py-2 rounded-lg font-semibold text-sm transition-all duration-300 flex-1"
+                    style={{
+                      background: activeTab === tab.id 
+                        ? `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`
+                        : "transparent",
+                      color: activeTab === tab.id ? theme.BG : theme.MUTED,
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div> */}
+
+              {/* Search Input */}
+              <div className="mb-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search upto 3 localities or landmarks"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-3 pr-32 rounded-xl text-sm outline-none transition-all"
+                    style={{
+                      backgroundColor: isDarkMode ? theme.BG : "#FFFFFF",
+                      border: `1px solid ${theme.LINE}`,
+                      color: theme.TEXT,
+                    }}
+                  />
+                  <button
+                    className="absolute right-1 top-1 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-transform hover:scale-105"
+                    style={{
+                      background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
+                      color: theme.BG,
+                    }}
+                  >
+                    <Search size={16} />
+                    Search
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters Row */}
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                {/* Property Type */}
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="propertyType"
+                      checked={propertyType === "fullHouse"}
+                      onChange={() => setPropertyType("fullHouse")}
+                      className="w-4 h-4"
+                      style={{ accentColor: theme.GOLD }}
+                    />
+                    <span className="text-sm font-medium">Full House</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="propertyType"
+                      checked={propertyType === "landPlot"}
+                      onChange={() => setPropertyType("landPlot")}
+                      className="w-4 h-4"
+                      style={{ accentColor: theme.GOLD }}
+                    />
+                    <span className="text-sm font-medium">Land/Plot</span>
+                  </label>
+                </div>
+
+                {/* BHK Type */}
+                <select
+                  value={bhkType}
+                  onChange={(e) => setBhkType(e.target.value)}
+                  className="px-3 py-2 rounded-lg text-sm font-medium outline-none cursor-pointer flex-1 min-w-[120px]"
+                  style={{
+                    backgroundColor: isDarkMode ? theme.ACCENT : theme.ACCENT,
+                    border: `1px solid ${theme.LINE}`,
+                    color: theme.TEXT,
+                  }}
+                >
+                  <option value="">BHK Type</option>
+                  <option value="1">1 BHK</option>
+                  <option value="2">2 BHK</option>
+                  <option value="3">3 BHK</option>
+                  <option value="4">4 BHK</option>
+                  <option value="5+">5+ BHK</option>
+                </select>
+
+                {/* Property Status */}
+                <select
+                  value={propertyStatus}
+                  onChange={(e) => setPropertyStatus(e.target.value)}
+                  className="px-3 py-2 rounded-lg text-sm font-medium outline-none cursor-pointer flex-1 min-w-[140px]"
+                  style={{
+                    backgroundColor: isDarkMode ? theme.ACCENT : theme.ACCENT,
+                    border: `1px solid ${theme.LINE}`,
+                    color: theme.TEXT,
+                  }}
+                >
+                  <option value="">Property Status</option>
+                  <option value="ready">Ready to Move</option>
+                  <option value="construction">Under Construction</option>
+                </select>
+
+                {/* New Builder Projects */}
+                <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg flex-1 min-w-[180px]" 
+                  style={{ border: `1px solid ${theme.LINE}` }}>
+                  <input
+                    type="checkbox"
+                    checked={newBuilder}
+                    onChange={(e) => setNewBuilder(e.target.checked)}
+                    className="w-4 h-4"
+                    style={{ accentColor: theme.GOLD }}
+                  />
+                  <span className="text-sm font-medium">New Builder Projects</span>
+                </label>
+              </div>
+
+              {/* Popular Localities */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold" style={{ color: theme.MUTED }}>
+                  Popular Localities:
+                </span>
+                {POPULAR_LOCALITIES.map((loc) => (
+                  <button
+                    key={loc}
+                    className="px-2.5 py-1 rounded text-xs font-medium transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: `${theme.ACCENT}80`,
+                      border: `1px solid ${theme.GOLD}30`,
+                      color: theme.TEXT,
+                    }}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Trust Indicators */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="flex flex-wrap justify-center gap-8 mt-8"
+          >
+            {[
+              ["100% Verified", "Properties"],
+              ["500+", "Happy Families"],
+              ["40+", "Localities"],
+              ["24/7", "Support"]
+            ].map(([number, text]) => (
+              <div key={text} className="text-center">
+                <div className="text-lg font-bold" style={{ color: theme.GOLD }}>
+                  {number}
+                </div>
+                <div className="text-xs font-medium" style={{ color: theme.MUTED }}>
+                  {text}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* ================= HERO ================= */}
-      <motion.section className="relative overflow-hidden" {...section}>
-        <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left copy */}
+      <motion.section className="relative overflow-hidden py-16" {...section}>
+        <div className="relative max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="space-y-8 z-10"
+              className="space-y-6 z-10"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-medium"
+                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-medium"
                 style={{
                   background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
                   border: `1px solid ${theme.GOLD}33`,
@@ -215,7 +475,7 @@ export default function Home() {
                 <span>Hyderabad's Property Consultants</span>
               </motion.div>
 
-              <h1 className="text-[48px] md:text-[76px] leading-[0.95] font-black tracking-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
                 Turning Dreams
                 <br />
                 Into{" "}
@@ -232,7 +492,7 @@ export default function Home() {
                     Addresses
                   </span>
                   <motion.span
-                    className="absolute left-0 right-0 -bottom-3 h-[12px] rounded-full blur-sm"
+                    className="absolute left-0 right-0 -bottom-2 h-2 rounded-full blur-sm"
                     style={{
                       background: `linear-gradient(90deg, ${theme.GOLD} 0%, ${theme.GOLD_L} 100%)`,
                       opacity: 0.5,
@@ -243,16 +503,12 @@ export default function Home() {
                 </span>
               </h1>
 
-              <p
-                className="text-[19px] leading-relaxed max-w-xl font-light"
-                style={{ color: theme.MUTED }}
-              >
+              <p className="text-lg leading-relaxed max-w-xl font-light" style={{ color: theme.MUTED }}>
                 We help families find beautiful, trusted homes across Hyderabad — with
-                clear details, honest guidance, and a smooth, worry-free buying
-                experience.
+                clear details, honest guidance, and a smooth, worry-free buying experience.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-2">
+              <div className="flex flex-wrap gap-2 pt-2">
                 {[
                   [ShieldCheck, "Verified Titles"],
                   [Award, "Premium Selection"],
@@ -260,7 +516,7 @@ export default function Home() {
                 ].map(([Icon, label]) => (
                   <div
                     key={label}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium"
                     style={{
                       backgroundColor: `${theme.ACCENT}80`,
                       border: `1px solid ${theme.LINE}`,
@@ -273,10 +529,10 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-wrap gap-3 pt-4">
                 <Link
                   to="/properties"
-                  className="group px-8 py-5 rounded-2xl font-semibold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
+                  className="group px-6 py-4 rounded-2xl font-semibold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
                   style={{
                     background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
                     color: theme.BG,
@@ -290,7 +546,7 @@ export default function Home() {
                   href="https://youtube.com/@vpfpropertieshyd"
                   target="_blank"
                   rel="noreferrer"
-                  className="px-8 py-5 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
+                  className="px-6 py-4 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
                   style={{
                     border: `1.5px solid ${theme.GOLD}60`,
                     color: theme.TEXT,
@@ -303,7 +559,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Right image */}
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 32 }}
               animate={{ opacity: 1, x: 0 }}
@@ -311,15 +566,14 @@ export default function Home() {
               className="relative"
             >
               <div className="relative">
-                {/* Glow behind image */}
                 {isDarkMode && (
                   <div
-                    className="absolute inset-0 rounded-[32px] blur-3xl opacity-30"
+                    className="absolute inset-0 rounded-3xl blur-3xl opacity-30"
                     style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)` }}
                   />
                 )}
                 <div
-                  className="relative rounded-[32px] overflow-hidden border-2"
+                  className="relative rounded-3xl overflow-hidden border-2"
                   style={{
                     borderColor: `${theme.GOLD}40`,
                     boxShadow: `0 40px 100px rgba(0,0,0,.6), inset 0 0 0 1px ${theme.GOLD}20`,
@@ -329,14 +583,13 @@ export default function Home() {
                   <img
                     src="https://i.pinimg.com/736x/f7/7e/ac/f77eacc3c207119451c82cbdc01be703.jpg"
                     alt="Premium Hyderabad residence"
-                    className="w-full h-[580px] object-cover"
+                    className="w-full h-[500px] object-cover"
                   />
                   <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-black/60' : 'from-black/40'} via-transparent to-transparent`} />
                 </div>
 
-                {/* Floating badge */}
                 <motion.div
-                  className="absolute -bottom-8 -left-8 px-6 py-4 rounded-2xl backdrop-blur-xl"
+                  className="absolute -bottom-4 -left-4 px-5 py-3 rounded-2xl backdrop-blur-xl"
                   style={{
                     background: `linear-gradient(135deg, ${theme.ACCENT}E6 0%, ${theme.SURFACE}E6 100%)`,
                     border: `1px solid ${theme.GOLD}40`,
@@ -348,13 +601,13 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="h-12 w-12 rounded-xl flex items-center justify-center"
+                      className="h-10 w-10 rounded-xl flex items-center justify-center"
                       style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)` }}
                     >
-                      <ShieldCheck size={24} color={theme.BG} />
+                      <ShieldCheck size={20} color={theme.BG} />
                     </div>
                     <div>
-                      <div className="text-base font-bold" style={{ color: theme.GOLD }}>
+                      <div className="text-sm font-bold" style={{ color: theme.GOLD }}>
                         100% Verified
                       </div>
                       <div className="text-xs font-medium" style={{ color: theme.MUTED }}>
@@ -367,8 +620,7 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Premium Stats */}
-          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-6 max-w-3xl mt-20">
+          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-4 max-w-3xl mt-16">
             {[
               ["250+", "Site Visits", "Curated Tours"],
               ["120+", "Happy Families", "Satisfied Clients"],
@@ -377,7 +629,7 @@ export default function Home() {
               <motion.div
                 key={l}
                 variants={item}
-                className="rounded-2xl text-center px-6 py-5 backdrop-blur-sm relative overflow-hidden group cursor-pointer"
+                className="rounded-2xl text-center p-5 backdrop-blur-sm relative overflow-hidden group cursor-pointer"
                 style={{
                   background: `linear-gradient(135deg, ${theme.ACCENT}80 0%, ${theme.SURFACE}60 100%)`,
                   border: `1px solid ${theme.LINE}`,
@@ -389,7 +641,7 @@ export default function Home() {
                 />
                 <div className="relative z-10">
                   <div
-                    className="text-3xl font-black mb-1"
+                    className="text-2xl font-black mb-1"
                     style={{
                       background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
                       WebkitBackgroundClip: "text",
@@ -411,7 +663,7 @@ export default function Home() {
       </motion.section>
 
       {/* ================= HIGHLIGHTS ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-20" {...section}>
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
         <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -422,10 +674,10 @@ export default function Home() {
           >
             WHY CHOOSE VPF PROPERTIES
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-black">Excellence in Every Detail</h2>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Excellence in Every Detail</h2>
         </div>
 
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             [HomeIcon, "Premium Selection", "Hand-picked luxury homes and villas in Hyderabad's most coveted locations."],
             [Landmark, "Legal Assurance", "Comprehensive verification with clear titles and vetted documentation."],
@@ -435,11 +687,11 @@ export default function Home() {
             <motion.div
               key={i}
               variants={item}
-              className="group rounded-3xl p-7 backdrop-blur-sm relative overflow-hidden hover:-translate-y-2 transition-all duration-500 cursor-pointer"
+              className="group rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden hover:-translate-y-1 transition-all duration-500 cursor-pointer"
               style={{
                 background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
                 border: `1px solid ${theme.LINE}`,
-                boxShadow: "0 10px 40px rgba(0,0,0,.3)",
+                boxShadow: "0 8px 32px rgba(0,0,0,.2)",
               }}
             >
               <div
@@ -448,10 +700,225 @@ export default function Home() {
               />
               <div className="relative z-10">
                 <div
-                  className="h-14 w-14 rounded-2xl flex items-center justify-center mb-4"
+                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: `linear-gradient(135deg, ${theme.GOLD}20 0%, ${theme.GOLD}10 100%)`, border: `1px solid ${theme.GOLD}30` }}
                 >
-                  <Icon className="h-7 w-7" color={theme.GOLD} />
+                  <Icon className="h-6 w-6" color={theme.GOLD} />
+                </div>
+                <div className="font-bold text-base mb-2">{h}</div>
+                <div className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
+                  {p}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.section>
+
+      {/* ================= FEATURED LISTINGS ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
+            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+          >
+            SIGNATURE COLLECTION
+          </motion.div>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Featured Properties</h2>
+          <p className="text-base" style={{ color: theme.MUTED }}>
+            Handpicked residences for the discerning buyer
+          </p>
+        </div>
+
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {FEATURED.map((p) => (
+            <motion.article
+              key={p.id}
+              variants={item}
+              className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1 cursor-pointer"
+              style={{
+                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+                border: `1px solid ${theme.LINE}`,
+                boxShadow: "0 16px 48px rgba(0,0,0,.3)",
+              }}
+            >
+              <div
+                className="absolute left-4 top-4 z-10 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-md"
+                style={{
+                  background: `linear-gradient(135deg, ${theme.GOLD}E6 0%, ${theme.GOLD_D}E6 100%)`,
+                  color: theme.BG,
+                  boxShadow: `0 4px 12px ${theme.GOLD}40`,
+                }}
+              >
+                {p.tag}
+              </div>
+              <button
+                className="absolute right-4 top-4 z-10 p-2 rounded-full backdrop-blur-md hover:scale-110 transition-transform"
+                style={{ backgroundColor: `${theme.BG}B3` }}
+                aria-label="Save"
+              >
+                <Heart className="h-4 w-4" color={theme.GOLD} />
+              </button>
+              <div className="relative overflow-hidden">
+                <img src={p.image} alt={p.title} className="w-full h-60 object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `linear-gradient(180deg, transparent 0%, ${theme.BG}CC 100%)` }}
+                />
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold mb-3">{p.title}</h3>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div
+                      className="text-2xl font-black"
+                      style={{
+                        background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      {fmtLakh(p.priceLakh)}
+                    </div>
+                    <div className="text-xs mt-1" style={{ color: theme.MUTED }}>
+                      <MapPin size={12} className="inline mr-1" />
+                      {p.locality}
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" color={theme.GOLD} />
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </motion.div>
+
+        <div className="text-center mt-10">
+          <Link
+            to="/properties"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-transform hover:scale-105"
+            style={{ border: `2px solid ${theme.GOLD}60`, color: theme.GOLD, backgroundColor: `${theme.ACCENT}80` }}
+          >
+            View Properties
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </motion.section>
+
+      {/* ================= VIDEO GALLERY ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+          <div className="text-center md:text-left">
+            <div
+              className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-3"
+              style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+            >
+              PROPERTY VIDEO TOURS
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black">Experience the Lifestyle</h2>
+            <p className="mt-2 text-sm" style={{ color: theme.MUTED }}>
+              Explore our projects through immersive video walkthroughs
+            </p>
+          </div>
+          <a
+            href="https://www.youtube.com/@vpfpropertieshyd/featured"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold"
+            style={{ border: `1px solid ${theme.GOLD}55`, color: theme.TEXT, backgroundColor: `${theme.ACCENT}60` }}
+          >
+            <Youtube size={16} color={theme.GOLD} />
+            Open Channel
+          </a>
+        </div>
+
+        <div
+          className="relative rounded-2xl overflow-hidden border shadow-xl"
+          style={{ borderColor: `${theme.GOLD}33`, background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)` }}
+        >
+          <iframe
+            key={activeId}
+            className="w-full h-[300px] md:h-[400px]"
+            src={`https://www.youtube.com/embed/${activeId}?rel=0&modestbranding=1`}
+            title="VPF Properties Video"
+            frameBorder="0"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+
+        <div className="mt-5 flex gap-3 overflow-x-auto pb-2">
+          {VIDEO_IDS.map((vid) => (
+            <button
+              key={vid}
+              onClick={() => setActiveId(vid)}
+              className="flex-shrink-0 w-60 rounded-xl overflow-hidden border transition-transform hover:scale-[1.02]"
+              style={{
+                border: `1px solid ${vid === activeId ? theme.GOLD : theme.LINE}`,
+                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+              }}
+            >
+              <div className="relative">
+                <img
+                  src={`https://img.youtube.com/vi/${vid}/mqdefault.jpg`}
+                  alt="Thumbnail"
+                  className="w-full h-32 object-cover"
+                />
+                <div className="absolute inset-0 grid place-items-center opacity-0 hover:opacity-100 transition-opacity">
+                  <div
+                    className="h-8 w-8 rounded-full grid place-items-center"
+                    style={{ backgroundColor: `${theme.BG}CC`, border: `1px solid ${theme.GOLD}66` }}
+                  >
+                    <Youtube size={16} color={theme.GOLD} />
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ================= PROCESS ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
+            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+          >
+            OUR PROCESS
+          </motion.div>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Your Journey to Home Ownership</h2>
+          <p className="text-base" style={{ color: theme.MUTED }}>Easy, high-quality help every step of the way</p>
+        </div>
+
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-4 gap-5">
+          {[
+            [Layers, "01", "Discovery", "Share your vision and budget with our consultants."],
+            [MapPin, "02", "Curated Tours", "Experience premium properties with guided visits."],
+            [ShieldCheck, "03", "Verification", "Complete legal due diligence and documentation."],
+            [Wallet, "04", "Acquisition", "Transparent closing with expert guidance."],
+          ].map(([Icon, num, h, p], i) => (
+            <motion.div
+              key={i}
+              variants={item}
+              className="relative rounded-2xl p-6 backdrop-blur-sm group hover:-translate-y-1 transition-all duration-500"
+              style={{ background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`, border: `1px solid ${theme.LINE}` }}
+            >
+              <div className="absolute top-3 right-3 text-4xl font-black opacity-5" style={{ color: theme.GOLD }}>
+                {num}
+              </div>
+              <div className="relative z-10">
+                <div
+                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: `linear-gradient(135deg, ${theme.GOLD}20 0%, ${theme.GOLD}10 100%)`, border: `1px solid ${theme.GOLD}30` }}
+                >
+                  <Icon size={20} color={theme.GOLD} />
                 </div>
                 <div className="font-bold text-lg mb-2">{h}</div>
                 <div className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
@@ -463,226 +930,9 @@ export default function Home() {
         </motion.div>
       </motion.section>
 
-      {/* ================= FEATURED LISTINGS ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-20" {...section}>
-        <div className="mb-14 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
-          >
-            SIGNATURE COLLECTION
-          </motion.div>
-          <h2 className="text-4xl md:text-5xl font-black mb-4">Featured Properties</h2>
-          <p className="text-lg" style={{ color: theme.MUTED }}>
-            Handpicked residences for the discerning buyer
-          </p>
-        </div>
-
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {FEATURED.map((p) => (
-            <motion.article
-              key={p.id}
-              variants={item}
-              className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
-              style={{
-                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-                border: `1px solid ${theme.LINE}`,
-                boxShadow: "0 20px 60px rgba(0,0,0,.4)",
-              }}
-            >
-              <div
-                className="absolute left-5 top-5 z-10 px-4 py-2 text-xs font-bold rounded-full backdrop-blur-md"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.GOLD}E6 0%, ${theme.GOLD_D}E6 100%)`,
-                  color: theme.BG,
-                  boxShadow: `0 4px 12px ${theme.GOLD}40`,
-                }}
-              >
-                {p.tag}
-              </div>
-              <button
-                className="absolute right-5 top-5 z-10 p-2.5 rounded-full backdrop-blur-md hover:scale-110 transition-transform"
-                style={{ backgroundColor: `${theme.BG}B3` }}
-                aria-label="Save"
-              >
-                <Heart className="h-5 w-5" color={theme.GOLD} />
-              </button>
-              <div className="relative overflow-hidden">
-                <img src={p.image} alt={p.title} className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: `linear-gradient(180deg, transparent 0%, ${theme.BG}CC 100%)` }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-3">{p.title}</h3>
-                <div className="flex items-end justify-between">
-                  <div>
-                    <div
-                      className="text-3xl font-black"
-                      style={{
-                        background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
-                      {fmtLakh(p.priceLakh)}
-                    </div>
-                    <div className="text-sm mt-1" style={{ color: theme.MUTED }}>
-                      <MapPin size={14} className="inline mr-1" />
-                      {p.locality}
-                    </div>
-                  </div>
-                  <ArrowRight className="h-6 w-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" color={theme.GOLD} />
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </motion.div>
-
-        <div className="text-center mt-12">
-          <Link
-            to="/properties"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold transition-transform hover:scale-105"
-            style={{ border: `2px solid ${theme.GOLD}60`, color: theme.GOLD, backgroundColor: `${theme.ACCENT}80` }}
-          >
-            View Properties
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-      </motion.section>
-
-      {/* ================= NEW: VIDEO GALLERY (YouTube) ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-20" {...section}>
-        <div className="mb-10 flex items-center justify-between gap-4 flex-wrap">
-          <div className="text-center md:text-left">
-            <div
-              className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-3"
-              style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
-            >
-              PROPERTY VIDEO TOURS
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black">Experience the Lifestyle</h2>
-            <p className="mt-2 text-sm md:text-base" style={{ color: theme.MUTED }}>
-              Explore our projects through immersive video walkthroughs
-            </p>
-          </div>
-          <a
-            href="https://www.youtube.com/@vpfpropertieshyd/featured"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold"
-            style={{ border: `1px solid ${theme.GOLD}55`, color: theme.TEXT, backgroundColor: `${theme.ACCENT}60` }}
-          >
-            <Youtube size={18} color={theme.GOLD} />
-            Open Channel
-          </a>
-        </div>
-
-        {/* Player */}
-        <div
-          className="relative rounded-3xl overflow-hidden border shadow-2xl"
-          style={{ borderColor: `${theme.GOLD}33`, background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)` }}
-        >
-          <iframe
-            key={activeId}
-            className="w-full h-[420px] md:h-[520px]"
-            src={`https://www.youtube.com/embed/${activeId}?rel=0&modestbranding=1`}
-            title="VPF Properties Video"
-            frameBorder="0"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-
-        {/* Thumbnails row */}
-        <div className="mt-6 flex gap-4 overflow-x-auto pb-2">
-          {VIDEO_IDS.map((vid) => (
-            <button
-              key={vid}
-              onClick={() => setActiveId(vid)}
-              className="flex-shrink-0 w-72 rounded-2xl overflow-hidden border transition-transform hover:scale-[1.02]"
-              style={{
-                border: `1px solid ${vid === activeId ? theme.GOLD : theme.LINE}`,
-                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-              }}
-            >
-              <div className="relative">
-                <img
-                  src={`https://img.youtube.com/vi/${vid}/mqdefault.jpg`}
-                  alt="Thumbnail"
-                  className="w-full h-44 object-cover"
-                />
-                <div className="absolute inset-0 grid place-items-center opacity-0 hover:opacity-100 transition-opacity">
-                  <div
-                    className="h-10 w-10 rounded-full grid place-items-center"
-                    style={{ backgroundColor: `${theme.BG}CC`, border: `1px solid ${theme.GOLD}66` }}
-                  >
-                    <Youtube size={20} color={theme.GOLD} />
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* ================= PROCESS ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-20" {...section}>
-        <div className="mb-14 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
-          >
-            OUR PROCESS
-          </motion.div>
-          <h2 className="text-4xl md:text-5xl font-black mb-4">Your Journey to Home Ownership</h2>
-          <p className="text-lg" style={{ color: theme.MUTED }}>Easy, high-quality help every step of the way</p>
-        </div>
-
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-4 gap-6">
-          {[
-            [Layers, "01", "Discovery", "Share your vision and budget with our consultants."],
-            [MapPin, "02", "Curated Tours", "Experience premium properties with guided visits."],
-            [ShieldCheck, "03", "Verification", "Complete legal due diligence and documentation."],
-            [Wallet, "04", "Acquisition", "Transparent closing with expert guidance."],
-          ].map(([Icon, num, h, p], i) => (
-            <motion.div
-              key={i}
-              variants={item}
-              className="relative rounded-3xl p-7 backdrop-blur-sm group hover:-translate-y-2 transition-all duration-500"
-              style={{ background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`, border: `1px solid ${theme.LINE}` }}
-            >
-              <div className="absolute top-4 right-4 text-6xl font-black opacity-5" style={{ color: theme.GOLD }}>
-                {num}
-              </div>
-              <div className="relative z-10">
-                <div
-                  className="h-14 w-14 rounded-2xl flex items-center justify-center mb-5"
-                  style={{ background: `linear-gradient(135deg, ${theme.GOLD}20 0%, ${theme.GOLD}10 100%)`, border: `1px solid ${theme.GOLD}30` }}
-                >
-                  <Icon size={24} color={theme.GOLD} />
-                </div>
-                <div className="font-bold text-xl mb-2">{h}</div>
-                <div className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
-                  {p}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.section>
-
       {/* ================= REVIEWS ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-20" {...section}>
-        <div className="mb-14 text-center">
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -692,31 +942,31 @@ export default function Home() {
           >
             CLIENT TESTIMONIALS
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-black mb-4">Trusted by Families</h2>
-          <p className="text-lg" style={{ color: theme.MUTED }}>Real experiences from satisfied homeowners</p>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Trusted by Families</h2>
+          <p className="text-base" style={{ color: theme.MUTED }}>Real experiences from satisfied homeowners</p>
         </div>
 
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-3 gap-8">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map(([name, stars, text]) => (
             <motion.article
               key={name}
               variants={item}
-              className="rounded-3xl p-8 backdrop-blur-sm relative overflow-hidden group hover:-translate-y-1 transition-all duration-500"
+              className="rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group hover:-translate-y-1 transition-all duration-500"
               style={{ background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`, border: `1px solid ${theme.LINE}` }}
             >
-              <div className="absolute top-0 right-0 text-9xl font-black opacity-5" style={{ color: theme.GOLD }}>
+              <div className="absolute top-0 right-0 text-6xl font-black opacity-5" style={{ color: theme.GOLD }}>
                 "
               </div>
               <div className="relative z-10">
                 <div className="flex gap-1 mb-4">
                   {Array.from({ length: stars }).map((_, i) => (
-                    <Star key={i} className="h-5 w-5" color={theme.GOLD} fill={theme.GOLD} />
+                    <Star key={i} className="h-4 w-4" color={theme.GOLD} fill={theme.GOLD} />
                   ))}
                 </div>
-                <p className="text-base leading-relaxed mb-6">{text}</p>
+                <p className="text-sm leading-relaxed mb-4">{text}</p>
                 <div className="flex items-center gap-3">
                   <div
-                    className="h-12 w-12 rounded-full flex items-center justify-center font-bold text-lg"
+                    className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-base"
                     style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`, color: theme.BG }}
                   >
                     {name[0]}
@@ -732,13 +982,13 @@ export default function Home() {
       </motion.section>
 
       {/* ================= FAQ ================= */}
-      <motion.section className="max-w-5xl mx-auto px-6 py-20" {...section}>
+      <motion.section className="max-w-5xl mx-auto px-6 py-16" {...section}>
         <div
-          className="rounded-3xl p-8 md:p-12 backdrop-blur-sm"
+          className="rounded-2xl p-6 md:p-8 backdrop-blur-sm"
           style={{ background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`, border: `1px solid ${theme.LINE}` }}
         >
-          <h2 className="text-3xl md:text-4xl font-black mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-4">
+          <h2 className="text-2xl md:text-3xl font-black mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-3">
             {[
               ["How do I schedule a property viewing?", "Contact us through our website or call directly. Our concierge team will arrange personalized tours at your convenience, typically within 24–48 hours."],
               ["Are all properties legally verified?", "Absolutely. Every listing undergoes comprehensive legal due diligence. We ensure clear titles, proper documentation, and full regulatory compliance."],
@@ -747,14 +997,14 @@ export default function Home() {
             ].map(([q, a]) => (
               <details
                 key={q}
-                className="group rounded-2xl p-5 backdrop-blur-sm transition-all hover:bg-white/5"
+                className="group rounded-xl p-4 backdrop-blur-sm transition-all hover:bg-white/5"
                 style={{ border: `1px solid ${theme.LINE}` }}
               >
                 <summary className="flex cursor-pointer items-center justify-between list-none">
-                  <span className="font-semibold text-lg">{q}</span>
-                  <ChevronDown className="h-6 w-6 transition-transform group-open:rotate-180 flex-shrink-0 ml-4" color={theme.GOLD} />
+                  <span className="font-semibold text-base">{q}</span>
+                  <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180 flex-shrink-0 ml-4" color={theme.GOLD} />
                 </summary>
-                <p className="pt-4 text-base leading-relaxed" style={{ color: theme.MUTED }}>
+                <p className="pt-3 text-sm leading-relaxed" style={{ color: theme.MUTED }}>
                   {a}
                 </p>
               </details>
@@ -764,10 +1014,10 @@ export default function Home() {
       </motion.section>
 
       {/* ================= CTA ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 pb-24 pt-4" {...section}>
+      <motion.section className="max-w-7xl mx-auto px-6 pb-16 pt-4" {...section}>
         <div
-          className="relative overflow-hidden rounded-[32px] p-12 md:p-16"
-          style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 50%, ${theme.GOLD} 100%)`, boxShadow: `0 40px 100px ${theme.GOLD}40` }}
+          className="relative overflow-hidden rounded-3xl p-8 md:p-12"
+          style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 50%, ${theme.GOLD} 100%)`, boxShadow: `0 32px 80px ${theme.GOLD}40` }}
         >
           {!prefersReducedMotion && (
             <>
@@ -787,37 +1037,37 @@ export default function Home() {
             </>
           )}
 
-          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="text-center lg:text-left max-w-2xl">
-              <div className="flex items-center gap-2 mb-4 justify-center lg:justify-start">
-                <Sparkles size={24} color={theme.BG} />
+              <div className="flex items-center gap-2 mb-3 justify-center lg:justify-start">
+                <Sparkles size={20} color={theme.BG} />
                 <span className="text-sm font-bold tracking-wider" style={{ color: theme.BG }}>
                   READY TO BEGIN?
                 </span>
               </div>
-              <h3 className="text-4xl md:text-5xl font-black mb-4" style={{ color: theme.BG }}>
+              <h3 className="text-3xl md:text-4xl font-black mb-3" style={{ color: theme.BG }}>
                 Discover Your Dream Residence
               </h3>
-              <p className="text-lg leading-relaxed" style={{ color: `${theme.BG}E6` }}>
+              <p className="text-base leading-relaxed" style={{ color: `${theme.BG}E6` }}>
                 Connect with our property consultants today. Experience personalized service and find the perfect home for your family's legacy.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
               <Link
                 to="/properties"
-                className="group px-9 py-5 rounded-2xl font-bold text-lg transition-transform hover:scale-105 shadow-2xl flex items-center gap-3 justify-center"
+                className="group px-7 py-4 rounded-2xl font-bold text-base transition-transform hover:scale-105 shadow-2xl flex items-center gap-3 justify-center"
                 style={{ backgroundColor: theme.BG, color: theme.GOLD }}
               >
                 <span>View Portfolio</span>
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
                 href="tel:+919999999999"
-                className="px-9 py-5 rounded-2xl font-bold text-lg transition-transform hover:scale-105 flex items-center gap-3 justify-center backdrop-blur-sm"
+                className="px-7 py-4 rounded-2xl font-bold text-base transition-transform hover:scale-105 flex items-center gap-3 justify-center backdrop-blur-sm"
                 style={{ border: `2px solid ${theme.BG}60`, backgroundColor: "rgba(255,255,255,0.15)", color: theme.BG }}
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-4 w-4" />
                 <span>Schedule Call</span>
               </a>
             </div>
@@ -825,7 +1075,6 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Footer accent line */}
       <div className="h-px max-w-7xl mx-auto" style={{ background: `linear-gradient(90deg, transparent, ${theme.GOLD}40, transparent)` }} />
     </div>
   );
