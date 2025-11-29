@@ -1,5 +1,6 @@
-import { Phone, Mail, MapPin, Youtube, Crown, Facebook, Instagram, Linkedin } from "lucide-react";
-
+import { Phone, Mail, MapPin, Youtube, Crown, Facebook, Instagram, Linkedin, Send } from "lucide-react";
+import { useContext } from "react";
+import { SiteSettingsContext } from "../context/SiteSettingsContext";
 /* Match the homepage palette */
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -10,7 +11,9 @@ const GOLD = "#D4AF37";
 const GOLD_D = "#B8963A";
 const LINE = "#1F2847";
 
+
 export default function Footer() {
+  const settings = useContext(SiteSettingsContext);
   return (
     <footer
       className="relative overflow-hidden"
@@ -54,13 +57,13 @@ export default function Footer() {
             {/* social */}
             <div className="flex items-center gap-3 mt-6">
               {[
-                { Icon: Facebook, href: "#" },
-                { Icon: Instagram, href: "#" },
-                { Icon: Linkedin, href: "#" },
-                { Icon: Youtube, href: "https://youtube.com/@vpfpropertieshyd" },
-              ].map(({ Icon, href }) => (
+                { id: "facebook", Icon: Facebook, href: "#" },
+                { id: "instagram", Icon: Instagram, href: "#" },
+                { id: "linkedin", Icon: Linkedin, href: "#" },
+                { id: "youtube", Icon: Youtube, href: "https://youtube.com/@vpfpropertieshyd" },
+              ].map(({ id, Icon, href }) => (
                 <a
-                  key={href}
+                  key={id} // 👈 now unique
                   href={href}
                   target="_blank"
                   rel="noreferrer"
@@ -164,25 +167,36 @@ export default function Footer() {
             </div>
             <ul className="space-y-3 text-sm">
               <li>
-                <a href="mailto:info@vpfproperties.com" className="flex items-center gap-3 hover:-translate-x-0.5 transition">
+                <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-3 hover:-translate-x-0.5 transition">
                   <span
                     className="h-8 w-8 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${GOLD}15`, border: `1px solid ${GOLD}30` }}
                   >
                     <Mail className="h-4 w-4" color={GOLD} />
                   </span>
-                  <span style={{ color: MUTED }}>info@vpfproperties.com</span>
+                  <span style={{ color: MUTED }}>{settings.contact_email}</span>
                 </a>
               </li>
               <li>
-                <a href="tel:+919999999999" className="flex items-center gap-3 hover:-translate-x-0.5 transition">
+                <a href={`tel:${settings.phone_number}`} className="flex items-center gap-3 hover:-translate-x-0.5 transition">
                   <span
                     className="h-8 w-8 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${GOLD}15`, border: `1px solid ${GOLD}30` }}
                   >
                     <Phone className="h-4 w-4" color={GOLD} />
                   </span>
-                  <span style={{ color: MUTED }}>+91 99999 99999</span>
+                  <span style={{ color: MUTED }}>{settings.phone_number}</span>
+                </a>
+              </li>
+              <li>
+                <a href={`https://wa.me/${settings.whatsapp_number.replace("+","")}`} className="flex items-center gap-3 hover:-translate-x-0.5 transition">
+                  <span
+                    className="h-8 w-8 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${GOLD}15`, border: `1px solid ${GOLD}30` }}
+                  >
+                    <Send size={20} style={{ color: GOLD }} />
+                  </span>
+                  <span style={{ color: MUTED }}>WhatsApp Us</span>
                 </a>
               </li>
             </ul>

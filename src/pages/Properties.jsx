@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import FiltersBar from "../components/FiltersBar.jsx";
 import PropertyCard from "../components/PropertyCard.jsx";
-import { PROPERTIES } from "../data/sampleProperties.js";
 import { Sparkles, SlidersHorizontal, ChevronRight, Home } from "lucide-react";
-// import { PROPERTIES } from "../data/sampleProperties.js";
+import { API_BASE_URL } from "../config";
+import { SiteSettingsContext } from "../context/SiteSettingsContext";
+import { useLocation } from "react-router-dom";
 
 
 const BG = "#0A0E27";
@@ -20,32 +21,137 @@ const LINE = "#1F2847";
 export default function Properties() {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("priceAsc");
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // -----------------------
+  // 1) Load data from backend
+  // -----------------------
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [types, setTypes] = useState([]);
+
+useEffect(() => {
+  async function fetchProps() {
+    try {
+      // parallel fetch properties and property types
+      const [propsRes, typesRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/properties/list.php`),
+        fetch(`${API_BASE_URL}/property_types/list.php`),
+      ]);
+
+      if (!propsRes.ok) throw new Error("Failed to fetch properties");
+      if (!typesRes.ok) {
+        // property types are optional — fall back silently
+        console.warn("Failed to fetch property types, using defaults");
+      }
+
+      const data = await propsRes.json();
+      const typesData = typesRes.ok ? await typesRes.json() : null;
+
+      // Normalize backend fields -> frontend fields
+      const normalized = data.map((p) => ({
+        ...p,
+        priceLakh: Number(p.price_lakh || 0),
+        image: p.image_url || null,
+        // ensure property_type is a string (normalize trim)
+        property_type: (p.property_type || "").trim(),
+      }));
+
+      setProperties(normalized);
+
+      // typesData likely array of { id, name, slug, position }
+      if (Array.isArray(typesData)) {
+        // use the 'name' field as the display / filter value
+        setTypes(typesData.map(t => (t.name || "").trim()));
+      } else {
+        setTypes([]); // fallback
+      }
+    } catch (err) {
+      console.error("Failed to load properties or types:", err);
+      setError("Failed to load properties.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchProps();
+}, []);
+
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const localityParam = params.get("locality")?.trim();
+  const qParam = params.get("q")?.trim();
+  const newFilters = {};
+
+  if (localityParam) newFilters.locality = localityParam;
+  if (qParam) newFilters.q = qParam;
+
+  // only set if any param found
+  if (Object.keys(newFilters).length > 0) {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []); // run once on mount
+
+
+  // ------------------------------------------------------
+  // 2) Filtering & Sorting (uses normalized DB data)
+  // ------------------------------------------------------
   const filtered = useMemo(() => {
-    let list = [...PROPERTIES];
+    let list = [...properties];
+
     const { minPrice, maxPrice, locality, bedrooms, type, q } = filters;
 
     if (minPrice) list = list.filter((p) => p.priceLakh >= Number(minPrice));
     if (maxPrice) list = list.filter((p) => p.priceLakh <= Number(maxPrice));
-    if (locality && locality !== "All") list = list.filter((p) => p.locality === locality);
-    if (bedrooms && bedrooms !== "Any") list = list.filter((p) => p.bedrooms === Number(bedrooms));
-    if (type && type !== "Any") list = list.filter((p) => p.property_type === type);
+    if (locality && locality !== "All")
+      list = list.filter((p) => p.locality === locality);
+    if (bedrooms && bedrooms !== "Any")
+      list = list.filter((p) => Number(p.bedrooms) === Number(bedrooms));
+    if (type && type !== "Any")
+      list = list.filter((p) => p.property_type === type);
+
     if (q) {
       const query = q.toLowerCase();
       list = list.filter(
         (p) =>
-          p.title.toLowerCase().includes(query) ||
-          p.locality.toLowerCase().includes(query)
+          (p.title || "").toLowerCase().includes(query) ||
+          (p.locality || "").toLowerCase().includes(query)
       );
     }
 
-    if (sortBy === "priceAsc") list.sort((a, b) => a.priceLakh - b.priceLakh);
-    if (sortBy === "priceDesc") list.sort((a, b) => b.priceLakh - a.priceLakh);
+    if (sortBy === "priceAsc")
+      list.sort((a, b) => (a.priceLakh || 0) - (b.priceLakh || 0));
+    if (sortBy === "priceDesc")
+      list.sort((a, b) => (b.priceLakh || 0) - (a.priceLakh || 0));
 
     return list;
-  }, [filters, sortBy]);
+  }, [filters, sortBy, properties]);
 
+  // -------------------
+  // 3) Loading / Error
+  // -------------------
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading properties...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-300">
+        {error}
+      </div>
+    );
+  }
+
+  // -------------------
+  // UI Part (same as your design)
+  // -------------------
   return (
     <div
       className="min-h-screen relative"
@@ -78,10 +184,7 @@ export default function Properties() {
             <span>Home</span>
           </Link>
           <ChevronRight size={16} style={{ color: GOLD, opacity: 0.6 }} />
-          <span
-            className="font-medium"
-            style={{ color: GOLD }}
-          >
+          <span className="font-medium" style={{ color: GOLD }}>
             Properties
           </span>
         </nav>
@@ -103,6 +206,8 @@ export default function Properties() {
               >
                 <Sparkles size={14} />
                 <span>Curated Collection</span>
+
+
               </div>
 
               <h1 className="text-4xl md:text-5xl font-black" style={{ color: TEXT }}>
@@ -153,7 +258,7 @@ export default function Properties() {
 
           {/* Filters */}
           <div className="mt-10">
-            <FiltersBar data={PROPERTIES} onChange={setFilters} />
+            <FiltersBar data={properties} onChange={setFilters} types={types} />
           </div>
 
           {/* Count */}

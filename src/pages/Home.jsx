@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   Phone,
@@ -22,6 +23,7 @@ import {
   Search,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { API_BASE_URL } from "../config";
 
 /* -----------------------------
    PALETTE / TOKENS (Deep Navy + Champagne Gold + Marble White)
@@ -74,22 +76,56 @@ const HYDERABAD_LOCALITIES = [
 ];
 
 const POPULAR_LOCALITIES = ["Gachibowli", "Madhapur", "Kukatpally", "Kondapur", "Miyapur"];
+/* -----------------------------
+   UTIL - extract YouTube ID from many possible formats
+------------------------------ */
+function extractYouTubeId(url) {
+  if (!url) return null;
+  // If already an id
+  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+  try {
+    const u = new URL(url);
+    // youtube.com/watch?v=ID
+    if (u.hostname.includes("youtube.com")) {
+      if (u.searchParams.has("v")) return u.searchParams.get("v");
+      // playlist or other formats - fallback
+      const p = u.pathname.split("/");
+      return p.pop() || null;
+    }
+    // youtu.be/ID
+    if (u.hostname === "youtu.be") {
+      const p = u.pathname.split("/");
+      return p.pop() || null;
+    }
+  } catch (e) {
+    // fallback: try regex
+    const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/);
+    return m ? m[1] : null;
+  }
+  return null;
+}
 
 /* -----------------------------
    PAGE
 ------------------------------ */
 export default function Home() {
+  const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  // const [isDarkMode, setIsDarkMode] = useState(true);
+  const isDarkMode = true; // forced
+  const theme = DARK_THEME;
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [activeTab, setActiveTab] = useState("buy");
-  const [propertyType, setPropertyType] = useState("fullHouse");
-  const [bhkType, setBhkType] = useState("");
-  const [propertyStatus, setPropertyStatus] = useState("");
-  const [newBuilder, setNewBuilder] = useState(false);
+  // const [activeTab, setActiveTab] = useState("buy");
+  // const [propertyType, setPropertyType] = useState("fullHouse");
+  // const [bhkType, setBhkType] = useState("");
+  // const [propertyStatus, setPropertyStatus] = useState("");
+  // const [newBuilder, setNewBuilder] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  const theme = isDarkMode ? DARK_THEME : LIGHT_THEME;
+  const [featured, setFeatured] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [activeVideoId, setActiveVideoId] = useState(null);
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,13 +135,73 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fetch featured, videos, reviews from backend
+  useEffect(() => {
+    async function load() {
+      try {
+        // FEATURED
+        const fRes = await fetch(`${API_BASE_URL}/featured/list.php`);
+        const fJson = await fRes.json();
+        // normalize featured to expected shape: id (property id), title, priceLakh, locality, image, tag
+        const fNorm = (Array.isArray(fJson) ? fJson : []).map((f) => ({
+          // prefer property_id for navigation, but keep internal featured id as _fid
+          id: f.property_id ?? f.id,
+          _fid: f.id,
+          title: f.title ?? "",
+          priceLakh: f.price_lakh ? Number(f.price_lakh) : 0,
+          locality: f.locality ?? "",
+          image: f.image_url ?? f.thumbnail_url ?? null,
+          tag: f.note || "Featured",
+        }));
+        setFeatured(fNorm);
+
+        // VIDEOS
+        const vRes = await fetch(`${API_BASE_URL}/videos/list.php`);
+        const vJson = await vRes.json();
+        const vNorm = (Array.isArray(vJson) ? vJson : []).map((v) => {
+          const id = extractYouTubeId(v.video_url) || null;
+          return {
+            id: v.id,
+            title: v.title,
+            description: v.description,
+            videoUrl: v.video_url,
+            ytId: id,
+            thumbnail: v.thumbnail_url || (id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null),
+            position: v.position ?? 0,
+          };
+        });
+        setVideos(vNorm);
+        if (vNorm.length > 0 && !activeVideoId) {
+          // choose first available youtube id (or the raw videoUrl if no id)
+          setActiveVideoId(vNorm[0].ytId || vNorm[0].videoUrl);
+        }
+
+        // REVIEWS (only approved)
+        const rRes = await fetch(`${API_BASE_URL}/reviews/list.php?approved_only=1`);
+        const rJson = await rRes.json();
+        const rNorm = (Array.isArray(rJson) ? rJson : []).map((r) => ({
+          id: r.id,
+          author: r.author_name || "Anonymous",
+          rating: Number(r.rating) || 5,
+          text: r.text || "",
+        }));
+        setReviews(rNorm);
+      } catch (err) {
+        console.error("Failed to load homepage data:", err);
+      }
+    }
+    load();
+    // we only want this to run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-  };
+  }; 
 
   const section = {
     initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
@@ -123,9 +219,32 @@ export default function Home() {
     hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16, scale: prefersReducedMotion ? 1 : 0.96 },
     show:   { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
   };
+  function goToPropertiesWithLocality(locality) {
+    if (!locality) {
+      navigate("/properties");
+      return;
+    }
+    // encode and navigate
+    const q = new URLSearchParams({ locality: locality.trim() }).toString();
+    navigate(`/properties?${q}`);
+  }
 
-  const VIDEO_IDS = ["ntWlE3StjWo", "m_jfMBYbKFs", "hVxY2w59Uss", "cV2gBU6hKfY"];
-  const [activeId, setActiveId] = React.useState(VIDEO_IDS[0]);
+  const onSearchClick = () => {
+    if (!searchQuery || !searchQuery.trim()) {
+      // optional: navigate to properties without filter
+      navigate("/properties");
+      return;
+    }
+    goToPropertiesWithLocality(searchQuery);
+  };
+
+  // allow Enter key in input to submit
+  const onSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSearchClick();
+    }
+  };
 
   return (
     <div
@@ -297,129 +416,56 @@ export default function Home() {
               </div> */}
 
               {/* Search Input */}
-              <div className="mb-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search upto 3 localities or landmarks"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-3 pr-32 rounded-xl text-sm outline-none transition-all"
-                    style={{
-                      backgroundColor: isDarkMode ? theme.BG : "#FFFFFF",
-                      border: `1px solid ${theme.LINE}`,
-                      color: theme.TEXT,
-                    }}
-                  />
-                  <button
-                    className="absolute right-1 top-1 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-transform hover:scale-105"
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
-                      color: theme.BG,
-                    }}
-                  >
-                    <Search size={16} />
-                    Search
-                  </button>
-                </div>
-              </div>
+  <div className="mb-4">
+    <div className="relative">
+      <input
+        type="text"
+        placeholder="Search upto 3 localities or landmarks"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={onSearchKeyDown}
+        className="w-full px-4 py-3 pr-32 rounded-xl text-sm outline-none transition-all"
+        style={{
+          backgroundColor: theme.BG,
+          border: `1px solid ${theme.LINE}`,
+          color: theme.TEXT,
+        }}
+      />
+      <button
+        onClick={onSearchClick}
+        className="absolute right-1 top-1 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-transform hover:scale-105"
+        style={{
+          background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
+          color: theme.BG,
+        }}
+      >
+        <Search size={16} />
+        Search
+      </button>
+    </div>
+  </div>
 
-              {/* Filters Row */}
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                {/* Property Type */}
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="propertyType"
-                      checked={propertyType === "fullHouse"}
-                      onChange={() => setPropertyType("fullHouse")}
-                      className="w-4 h-4"
-                      style={{ accentColor: theme.GOLD }}
-                    />
-                    <span className="text-sm font-medium">Full House</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="propertyType"
-                      checked={propertyType === "landPlot"}
-                      onChange={() => setPropertyType("landPlot")}
-                      className="w-4 h-4"
-                      style={{ accentColor: theme.GOLD }}
-                    />
-                    <span className="text-sm font-medium">Land/Plot</span>
-                  </label>
-                </div>
-
-                {/* BHK Type */}
-                <select
-                  value={bhkType}
-                  onChange={(e) => setBhkType(e.target.value)}
-                  className="px-3 py-2 rounded-lg text-sm font-medium outline-none cursor-pointer flex-1 min-w-[120px]"
-                  style={{
-                    backgroundColor: isDarkMode ? theme.ACCENT : theme.ACCENT,
-                    border: `1px solid ${theme.LINE}`,
-                    color: theme.TEXT,
-                  }}
-                >
-                  <option value="">BHK Type</option>
-                  <option value="1">1 BHK</option>
-                  <option value="2">2 BHK</option>
-                  <option value="3">3 BHK</option>
-                  <option value="4">4 BHK</option>
-                  <option value="5+">5+ BHK</option>
-                </select>
-
-                {/* Property Status */}
-                <select
-                  value={propertyStatus}
-                  onChange={(e) => setPropertyStatus(e.target.value)}
-                  className="px-3 py-2 rounded-lg text-sm font-medium outline-none cursor-pointer flex-1 min-w-[140px]"
-                  style={{
-                    backgroundColor: isDarkMode ? theme.ACCENT : theme.ACCENT,
-                    border: `1px solid ${theme.LINE}`,
-                    color: theme.TEXT,
-                  }}
-                >
-                  <option value="">Property Status</option>
-                  <option value="ready">Ready to Move</option>
-                  <option value="construction">Under Construction</option>
-                </select>
-
-                {/* New Builder Projects */}
-                <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg flex-1 min-w-[180px]" 
-                  style={{ border: `1px solid ${theme.LINE}` }}>
-                  <input
-                    type="checkbox"
-                    checked={newBuilder}
-                    onChange={(e) => setNewBuilder(e.target.checked)}
-                    className="w-4 h-4"
-                    style={{ accentColor: theme.GOLD }}
-                  />
-                  <span className="text-sm font-medium">New Builder Projects</span>
-                </label>
-              </div>
 
               {/* Popular Localities */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold" style={{ color: theme.MUTED }}>
-                  Popular Localities:
-                </span>
-                {POPULAR_LOCALITIES.map((loc) => (
-                  <button
-                    key={loc}
-                    className="px-2.5 py-1 rounded text-xs font-medium transition-all hover:scale-105"
-                    style={{
-                      backgroundColor: `${theme.ACCENT}80`,
-                      border: `1px solid ${theme.GOLD}30`,
-                      color: theme.TEXT,
-                    }}
-                  >
-                    {loc}
-                  </button>
-                ))}
-              </div>
+    <span className="text-xs font-semibold" style={{ color: theme.MUTED }}>
+      Popular Localities:
+    </span>
+    {POPULAR_LOCALITIES.map((loc) => (
+      <button
+        key={loc}
+        onClick={() => goToPropertiesWithLocality(loc)}
+        className="px-2.5 py-1 rounded text-xs font-medium transition-all hover:scale-105"
+        style={{
+          backgroundColor: `${theme.ACCENT}80`,
+          border: `1px solid ${theme.GOLD}30`,
+          color: theme.TEXT,
+        }}
+      >
+        {loc}
+      </button>
+    ))}
+  </div>
             </div>
           </motion.div>
 
@@ -734,9 +780,9 @@ export default function Home() {
         </div>
 
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURED.map((p) => (
+          {featured.map((p) => (
             <motion.article
-              key={p.id}
+            key={`${p.id}-${p._fid || ""}`}
               variants={item}
               className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1 cursor-pointer"
               style={{
@@ -744,6 +790,7 @@ export default function Home() {
                 border: `1px solid ${theme.LINE}`,
                 boxShadow: "0 16px 48px rgba(0,0,0,.3)",
               }}
+              onClick={() => window.location.href = `/property/${p.id}`}
             >
               <div
                 className="absolute left-4 top-4 z-10 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-md"
@@ -840,9 +887,9 @@ export default function Home() {
           style={{ borderColor: `${theme.GOLD}33`, background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)` }}
         >
           <iframe
-            key={activeId}
+            key={activeVideoId || "empty"}
             className="w-full h-[300px] md:h-[400px]"
-            src={`https://www.youtube.com/embed/${activeId}?rel=0&modestbranding=1`}
+            src={activeVideoId && activeVideoId.length === 11 ? `https://www.youtube.com/embed/${activeVideoId}?rel=0&modestbranding=1` : activeVideoId}
             title="VPF Properties Video"
             frameBorder="0"
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -851,20 +898,20 @@ export default function Home() {
         </div>
 
         <div className="mt-5 flex gap-3 overflow-x-auto pb-2">
-          {VIDEO_IDS.map((vid) => (
+          {videos.map((v) => (
             <button
-              key={vid}
-              onClick={() => setActiveId(vid)}
+              key={v.id}
+              onClick={() => setActiveVideoId(v.ytId || v.videoUrl)}
               className="flex-shrink-0 w-60 rounded-xl overflow-hidden border transition-transform hover:scale-[1.02]"
               style={{
-                border: `1px solid ${vid === activeId ? theme.GOLD : theme.LINE}`,
+                border: `1px solid ${v.ytId === activeVideoId ? theme.GOLD : theme.LINE}`,
                 background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
               }}
             >
               <div className="relative">
                 <img
-                  src={`https://img.youtube.com/vi/${vid}/mqdefault.jpg`}
-                  alt="Thumbnail"
+                  src={v.thumbnail || "/fallback-video.jpg"}
+                  alt={v.title}
                   className="w-full h-32 object-cover"
                 />
                 <div className="absolute inset-0 grid place-items-center opacity-0 hover:opacity-100 transition-opacity">
@@ -874,6 +921,12 @@ export default function Home() {
                   >
                     <Youtube size={16} color={theme.GOLD} />
                   </div>
+                </div>
+              </div>
+              <div className="p-3 text-left">
+                <div className="font-semibold">{v.title}</div>
+                <div className="text-xs mt-1" style={{ color: theme.MUTED }}>
+                  {v.description ? v.description.slice(0, 80) + (v.description.length > 80 ? "…" : "") : ""}
                 </div>
               </div>
             </button>
@@ -947,9 +1000,11 @@ export default function Home() {
         </div>
 
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map(([name, stars, text]) => (
+          {reviews.length === 0 ? (
+            <div className="text-center text-sm text-white/60 col-span-3">No reviews yet</div>
+          ) : reviews.map((r) => (
             <motion.article
-              key={name}
+              key={r.id}
               variants={item}
               className="rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group hover:-translate-y-1 transition-all duration-500"
               style={{ background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`, border: `1px solid ${theme.LINE}` }}
@@ -959,20 +1014,20 @@ export default function Home() {
               </div>
               <div className="relative z-10">
                 <div className="flex gap-1 mb-4">
-                  {Array.from({ length: stars }).map((_, i) => (
+                  {Array.from({ length: r.rating }).map((_, i) => (
                     <Star key={i} className="h-4 w-4" color={theme.GOLD} fill={theme.GOLD} />
                   ))}
                 </div>
-                <p className="text-sm leading-relaxed mb-4">{text}</p>
+                <p className="text-sm leading-relaxed mb-4">{r.text}</p>
                 <div className="flex items-center gap-3">
                   <div
                     className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-base"
                     style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`, color: theme.BG }}
                   >
-                    {name[0]}
+                    {r.author?.[0] || "A"}
                   </div>
                   <div className="text-sm font-semibold" style={{ color: theme.MUTED }}>
-                    {name}
+                    {r.author}
                   </div>
                 </div>
               </div>

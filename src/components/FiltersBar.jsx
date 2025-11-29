@@ -12,7 +12,7 @@ const GOLD_L = "#E8C875";
 const GOLD_D = "#B8963A";
 const LINE = "#1F2847";
 
-export default function FiltersBar({ data = [], onChange }) {
+export default function FiltersBar({ data = [], onChange, types = [] }) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [locality, setLocality] = useState("All");
@@ -190,33 +190,44 @@ export default function FiltersBar({ data = [], onChange }) {
           </select>
         </div>
 
-        {/* Property Type */}
-        <div className="relative">
-          <label 
-            className="block text-xs font-semibold mb-2"
-            style={{ color: MUTED }}
-          >
-            Type
-          </label>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-            style={{
-              ...inputStyle,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              paddingRight: "3rem"
-            }}
-          >
-            {["Any", "Flat", "Villa", "Plot"].map((t) => (
-              <option key={t} value={t} style={{ backgroundColor: SURFACE, color: TEXT }}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Property Type (dynamic from backend) */}
+<div className="relative">
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Type
+  </label>
+  <select
+    value={type}
+    onChange={(e) => setType(e.target.value)}
+    className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem"
+    }}
+  >
+    <option value="Any" style={{ backgroundColor: SURFACE, color: TEXT }}>
+      Any
+    </option>
+
+    {Array.isArray(types) && types.length > 0 ? (
+      types.map((t) => (
+        <option key={t} value={t} style={{ backgroundColor: SURFACE, color: TEXT }}>
+          {t}
+        </option>
+      ))
+    ) : (
+      // fallback to old hardcoded list if types list is missing
+      ["Flat", "Villa", "Plot"].map((t) => (
+        <option key={t} value={t} style={{ backgroundColor: SURFACE, color: TEXT }}>
+          {t}
+        </option>
+      ))
+    )}
+  </select>
+</div>
+
 
         {/* Search */}
         <div className="relative md:col-span-2">

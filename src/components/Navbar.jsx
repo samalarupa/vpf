@@ -1,7 +1,8 @@
 import { NavLink, Link } from "react-router-dom";
-import { Home, Phone, Youtube, Crown, Menu, X } from "lucide-react";
+import { Home, Phone, Youtube, Crown, Menu, X, } from "lucide-react";
 import { useState } from "react";
-
+import { useContext } from "react";
+import { SiteSettingsContext } from "../context/SiteSettingsContext";
 /* Matching the homepage color palette */
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -10,6 +11,7 @@ const MUTED = "#B8BDD0";
 const GOLD = "#D4AF37";
 const GOLD_D = "#B8963A";
 const LINE = "#1F2847";
+
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,6 +30,7 @@ export default function Navbar() {
     color: isActive ? BG : TEXT,
     boxShadow: isActive ? `0 4px 12px ${GOLD}40` : 'none',
   });
+  const settings = useContext(SiteSettingsContext);
 
   return (
     <header 
@@ -97,7 +100,7 @@ export default function Navbar() {
             YouTube
           </a>
           <a
-            href="tel:+919999999999"
+            href={`tel:${settings.phone_number}`}
             className="ml-3 px-6 py-3 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
             style={{
               background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`,
