@@ -1,12 +1,19 @@
 import { useMemo, useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import FiltersBar from "../components/FiltersBar.jsx";
 import PropertyCard from "../components/PropertyCard.jsx";
 import { Sparkles, SlidersHorizontal, ChevronRight, Home } from "lucide-react";
 import { API_BASE_URL } from "../config";
 import { SiteSettingsContext } from "../context/SiteSettingsContext";
-import { useLocation } from "react-router-dom";
 
+// Normalize whatever backend sends into a simple number (1, 2, 3, …)
+const parseBedrooms = (value) => {
+  if (value === null || value === undefined) return null;
+
+  const str = String(value).trim(); // e.g. "3 BHK", "2bhk", "3", 3
+  const match = str.match(/\d+/);   // first digits
+  return match ? Number(match[0]) : null; // -> 3
+};
 
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -33,68 +40,74 @@ export default function Properties() {
   const [error, setError] = useState("");
   const [types, setTypes] = useState([]);
 
-useEffect(() => {
-  async function fetchProps() {
-    try {
-      // parallel fetch properties and property types
-      const [propsRes, typesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/properties/list.php`),
-        fetch(`${API_BASE_URL}/property_types/list.php`),
-      ]);
+  useEffect(() => {
+    async function fetchProps() {
+      try {
+        // parallel fetch properties and property types
+        const [propsRes, typesRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/properties/list.php`),
+          fetch(`${API_BASE_URL}/property_types/list.php`),
+        ]);
 
-      if (!propsRes.ok) throw new Error("Failed to fetch properties");
-      if (!typesRes.ok) {
-        // property types are optional — fall back silently
-        console.warn("Failed to fetch property types, using defaults");
+        if (!propsRes.ok) throw new Error("Failed to fetch properties");
+        if (!typesRes.ok) {
+          // property types are optional — fall back silently
+          console.warn("Failed to fetch property types, using defaults");
+        }
+
+        const data = await propsRes.json();
+        const typesData = typesRes.ok ? await typesRes.json() : null;
+
+        // Normalize backend fields -> frontend fields
+        const normalized = data.map((p) => ({
+          ...p,
+          priceLakh: Number(p.price_lakh || 0),
+          image: p.image_url || null,
+          // ensure property_type is a clean string
+          property_type: (p.property_type || "").trim(),
+          // normalize bedrooms / BHK from whatever field backend sends
+          bedrooms: parseBedrooms(
+            p.bedrooms ??
+              p.bhk ??
+              p.BHK ??
+              p.bedroom_count ??
+              p.bedroom
+          ),
+        }));
+
+        setProperties(normalized);
+
+        // typesData likely array of { id, name, slug, position }
+        if (Array.isArray(typesData)) {
+          // use the 'name' field as the display / filter value
+          setTypes(typesData.map((t) => (t.name || "").trim()));
+        } else {
+          setTypes([]); // fallback
+        }
+      } catch (err) {
+        console.error("Failed to load properties or types:", err);
+        setError("Failed to load properties.");
+      } finally {
+        setLoading(false);
       }
-
-      const data = await propsRes.json();
-      const typesData = typesRes.ok ? await typesRes.json() : null;
-
-      // Normalize backend fields -> frontend fields
-      const normalized = data.map((p) => ({
-        ...p,
-        priceLakh: Number(p.price_lakh || 0),
-        image: p.image_url || null,
-        // ensure property_type is a string (normalize trim)
-        property_type: (p.property_type || "").trim(),
-      }));
-
-      setProperties(normalized);
-
-      // typesData likely array of { id, name, slug, position }
-      if (Array.isArray(typesData)) {
-        // use the 'name' field as the display / filter value
-        setTypes(typesData.map(t => (t.name || "").trim()));
-      } else {
-        setTypes([]); // fallback
-      }
-    } catch (err) {
-      console.error("Failed to load properties or types:", err);
-      setError("Failed to load properties.");
-    } finally {
-      setLoading(false);
     }
-  }
-  fetchProps();
-}, []);
+    fetchProps();
+  }, []);
 
-useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const localityParam = params.get("locality")?.trim();
-  const qParam = params.get("q")?.trim();
-  const newFilters = {};
+  // read initial filters from URL (?locality=...&q=...)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const localityParam = params.get("locality")?.trim();
+    const qParam = params.get("q")?.trim();
+    const newFilters = {};
 
-  if (localityParam) newFilters.locality = localityParam;
-  if (qParam) newFilters.q = qParam;
+    if (localityParam) newFilters.locality = localityParam;
+    if (qParam) newFilters.q = qParam;
 
-  // only set if any param found
-  if (Object.keys(newFilters).length > 0) {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []); // run once on mount
-
+    if (Object.keys(newFilters).length > 0) {
+      setFilters((prev) => ({ ...prev, ...newFilters }));
+    }
+  }, [location.search]);
 
   // ------------------------------------------------------
   // 2) Filtering & Sorting (uses normalized DB data)
@@ -104,14 +117,48 @@ useEffect(() => {
 
     const { minPrice, maxPrice, locality, bedrooms, type, q } = filters;
 
-    if (minPrice) list = list.filter((p) => p.priceLakh >= Number(minPrice));
-    if (maxPrice) list = list.filter((p) => p.priceLakh <= Number(maxPrice));
-    if (locality && locality !== "All")
+    if (minPrice) {
+      list = list.filter((p) => p.priceLakh >= Number(minPrice));
+    }
+    if (maxPrice) {
+      list = list.filter((p) => p.priceLakh <= Number(maxPrice));
+    }
+    if (locality && locality !== "All") {
       list = list.filter((p) => p.locality === locality);
-    if (bedrooms && bedrooms !== "Any")
-      list = list.filter((p) => Number(p.bedrooms) === Number(bedrooms));
-    if (type && type !== "Any")
+    }
+
+    // BHK filter (robust against "3", "3 BHK", "3BHK", etc.)
+    if (bedrooms && bedrooms !== "Any") {
+      const bedNum = Number(bedrooms);
+
+      list = list.filter((p) => {
+        // prefer normalized numeric if present
+        if (
+          typeof p.bedrooms === "number" &&
+          !Number.isNaN(p.bedrooms)
+        ) {
+          return p.bedrooms === bedNum;
+        }
+
+        // fallback to raw backend text fields
+        const rawSource =
+          p.bedrooms ??
+          p.bhk ??
+          p.BHK ??
+          p.bedroom_count ??
+          p.bedroom ??
+          "";
+
+        const raw = String(rawSource).toLowerCase();
+        const needle = String(bedNum).toLowerCase();
+
+        return raw.includes(needle);
+      });
+    }
+
+    if (type && type !== "Any") {
       list = list.filter((p) => p.property_type === type);
+    }
 
     if (q) {
       const query = q.toLowerCase();
@@ -122,10 +169,12 @@ useEffect(() => {
       );
     }
 
-    if (sortBy === "priceAsc")
+    if (sortBy === "priceAsc") {
       list.sort((a, b) => (a.priceLakh || 0) - (b.priceLakh || 0));
-    if (sortBy === "priceDesc")
+    }
+    if (sortBy === "priceDesc") {
       list.sort((a, b) => (b.priceLakh || 0) - (a.priceLakh || 0));
+    }
 
     return list;
   }, [filters, sortBy, properties]);
@@ -150,7 +199,7 @@ useEffect(() => {
   }
 
   // -------------------
-  // UI Part (same as your design)
+  // UI Part
   // -------------------
   return (
     <div
@@ -168,7 +217,9 @@ useEffect(() => {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-20 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ background: `radial-gradient(circle, ${GOLD} 0%, transparent 70%)` }}
+          style={{
+            background: `radial-gradient(circle, ${GOLD} 0%, transparent 70%)`,
+          }}
         />
       </div>
 
@@ -183,7 +234,10 @@ useEffect(() => {
             <Home size={16} />
             <span>Home</span>
           </Link>
-          <ChevronRight size={16} style={{ color: GOLD, opacity: 0.6 }} />
+          <ChevronRight
+            size={16}
+            style={{ color: GOLD, opacity: 0.6 }}
+          />
           <span className="font-medium" style={{ color: GOLD }}>
             Properties
           </span>
@@ -191,7 +245,10 @@ useEffect(() => {
       </div>
 
       {/* Header */}
-      <section className="relative border-b pt-4 pb-12" style={{ borderColor: LINE }}>
+      <section
+        className="relative border-b pt-4 pb-12"
+        style={{ borderColor: LINE }}
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div className="space-y-4">
@@ -206,11 +263,12 @@ useEffect(() => {
               >
                 <Sparkles size={14} />
                 <span>Curated Collection</span>
-
-
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-black" style={{ color: TEXT }}>
+              <h1
+                className="text-4xl md:text-5xl font-black"
+                style={{ color: TEXT }}
+              >
                 Discover Your{" "}
                 <span
                   style={{
@@ -225,14 +283,18 @@ useEffect(() => {
               </h1>
 
               <p className="text-lg" style={{ color: MUTED }}>
-                Browse our verified homes and premium properties across Hyderabad.
+                Browse our verified homes and premium properties across
+                Hyderabad.
               </p>
             </div>
 
             {/* Sort */}
             <div className="flex items-center gap-3 ml-auto">
               <SlidersHorizontal size={18} style={{ color: GOLD }} />
-              <label className="text-sm font-medium" style={{ color: MUTED }}>
+              <label
+                className="text-sm font-medium"
+                style={{ color: MUTED }}
+              >
                 Sort by
               </label>
               <select
@@ -258,7 +320,13 @@ useEffect(() => {
 
           {/* Filters */}
           <div className="mt-10">
-            <FiltersBar data={properties} onChange={setFilters} types={types} />
+            <FiltersBar
+              data={properties}
+              onChange={setFilters}
+              types={types}
+              initialQ={filters.q}
+              initialLocality={filters.locality}
+            />
           </div>
 
           {/* Count */}
@@ -289,18 +357,29 @@ useEffect(() => {
               border: `1px solid ${LINE}`,
             }}
           >
-            <div className="text-6xl mb-4" style={{ color: GOLD, opacity: 0.3 }}>
+            <div
+              className="text-6xl mb-4"
+              style={{ color: GOLD, opacity: 0.3 }}
+            >
               🏘️
             </div>
-            <div className="text-xl font-bold mb-2" style={{ color: TEXT }}>
+            <div
+              className="text-xl font-bold mb-2"
+              style={{ color: TEXT }}
+            >
               No Properties Found
             </div>
-            <p style={{ color: MUTED }}>Try adjusting your filters to see more results</p>
+            <p style={{ color: MUTED }}>
+              Try adjusting your filters to see more results
+            </p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((p) => (
-              <div key={p.id} onClick={() => navigate(`/property/${p.id}`)}>
+              <div
+                key={p.id}
+                onClick={() => navigate(`/property/${p.id}`)}
+              >
                 <PropertyCard item={p} />
               </div>
             ))}

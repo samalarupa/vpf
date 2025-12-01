@@ -219,32 +219,61 @@ export default function Home() {
     hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16, scale: prefersReducedMotion ? 1 : 0.96 },
     show:   { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
   };
-  function goToPropertiesWithLocality(locality) {
-    if (!locality) {
-      navigate("/properties");
-      return;
-    }
-    // encode and navigate
-    const q = new URLSearchParams({ locality: locality.trim() }).toString();
-    navigate(`/properties?${q}`);
-  }
+  // function goToPropertiesWithLocality(locality) {
+  //   if (!locality) {
+  //     navigate("/properties");
+  //     return;
+  //   }
+  //   // encode and navigate
+  //   const q = new URLSearchParams({ locality: locality.trim() }).toString();
+  //   navigate(`/properties?${q}`);
+  // }
 
-  const onSearchClick = () => {
-    if (!searchQuery || !searchQuery.trim()) {
-      // optional: navigate to properties without filter
-      navigate("/properties");
-      return;
-    }
-    goToPropertiesWithLocality(searchQuery);
-  };
+  // const onSearchClick = () => {
+  //   if (!searchQuery || !searchQuery.trim()) {
+  //     // optional: navigate to properties without filter
+  //     navigate("/properties");
+  //     return;
+  //   }
+  //   goToPropertiesWithLocality(searchQuery);
+  // };
+
+
 
   // allow Enter key in input to submit
-  const onSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      onSearchClick();
-    }
-  };
+  // const onSearchKeyDown = (e) => {
+  //   if (e.key === "Enter") {
+  //     e.preventDefault();
+  //     onSearchClick();
+  //   }
+  // };
+  function goToPropertiesWithLocality(locality) {
+  if (!locality) {
+    navigate("/properties");
+    return;
+  }
+
+  // Always send as q=<text> so that Properties page search bar updates
+  const q = new URLSearchParams({ q: locality.trim() }).toString();
+  navigate(`/properties?${q}`);
+}
+
+const onSearchClick = () => {
+  if (!searchQuery || !searchQuery.trim()) {
+    navigate("/properties");
+    return;
+  }
+  goToPropertiesWithLocality(searchQuery);
+};
+
+const onSearchKeyDown = (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    onSearchClick();
+  }
+};
+
+
 
   return (
     <div

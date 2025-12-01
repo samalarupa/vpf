@@ -12,13 +12,14 @@ const GOLD_L = "#E8C875";
 const GOLD_D = "#B8963A";
 const LINE = "#1F2847";
 
-export default function FiltersBar({ data = [], onChange, types = [] }) {
+export default function FiltersBar({ data = [], onChange, types = [], initialQ = "", initialLocality = "" })
+ {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [locality, setLocality] = useState("All");
+  const [locality, setLocality] = useState(initialLocality || "All");
   const [bedrooms, setBedrooms] = useState("Any");
   const [type, setType] = useState("Any");
-  const [q, setQ] = useState("");
+ const [q, setQ] = useState(initialQ || "");
 
   const debounceRef = useRef(null);
 
