@@ -10,10 +10,17 @@ import { SiteSettingsContext } from "../context/SiteSettingsContext";
 const parseBedrooms = (value) => {
   if (value === null || value === undefined) return null;
 
-  const str = String(value).trim(); // e.g. "3 BHK", "2bhk", "3", 3
-  const match = str.match(/\d+/);   // first digits
-  return match ? Number(match[0]) : null; // -> 3
+  const str = String(value).trim(); // e.g. "3 BHK", "2bhk", "3", "Studio", 3
+
+  if (!str) return null;
+
+  // treat "studio" or similar as 1 (optional — change if you prefer studio => 0)
+  if (/studio/i.test(str)) return 1;
+
+  const match = str.match(/(\d+)/); // first digits
+  return match ? Number(match[1]) : null; // -> 3
 };
+
 
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -58,22 +65,33 @@ export default function Properties() {
         const data = await propsRes.json();
         const typesData = typesRes.ok ? await typesRes.json() : null;
 
-        // Normalize backend fields -> frontend fields
-        const normalized = data.map((p) => ({
-          ...p,
-          priceLakh: Number(p.price_lakh || 0),
-          image: p.image_url || null,
-          // ensure property_type is a clean string
-          property_type: (p.property_type || "").trim(),
-          // normalize bedrooms / BHK from whatever field backend sends
-          bedrooms: parseBedrooms(
+        const normalized = data.map((p) => {
+          // try a number of possible fields the backend might use
+          const rawRooms =
             p.bedrooms ??
-              p.bhk ??
-              p.BHK ??
-              p.bedroom_count ??
-              p.bedroom
-          ),
-        }));
+            p.rooms ??
+            p.rooms_text ??
+            p.rooms_count ??
+            p.bhk ??
+            p.BHK ??
+            p.bedroom_count ??
+            p.bedroom ??
+            p.room ??
+            "";
+        
+          return {
+            ...p,
+            priceLakh: Number(p.price_lakh || 0),
+            image: p.image_url || null,
+            // ensure property_type is a clean string
+            property_type: (p.property_type || "").trim(),
+            // normalized numeric bedrooms for filtering
+            bedrooms: parseBedrooms(rawRooms),
+            // keep rawRooms for fallback + debugging
+            rooms_raw: rawRooms,
+          };
+        });
+        
 
         setProperties(normalized);
 
@@ -142,17 +160,26 @@ export default function Properties() {
 
         // fallback to raw backend text fields
         const rawSource =
-          p.bedrooms ??
-          p.bhk ??
-          p.BHK ??
-          p.bedroom_count ??
-          p.bedroom ??
-          "";
+        p.rooms_raw ??
+        p.rooms ??
+        p.bedrooms ??
+        p.bhk ??
+        p.BHK ??
+        p.bedroom_count ??
+        p.bedroom ??
+        p.room ??
+        "";
 
         const raw = String(rawSource).toLowerCase();
         const needle = String(bedNum).toLowerCase();
 
-        return raw.includes(needle);
+        // contains number (e.g., "2 bhk", "3BHK") — ok
+    if (raw.includes(needle)) return true;
+
+    // special case: if bedNum === 1, allow "studio" to match (if you used that convention)
+    if (bedNum === 1 && /studio/.test(raw)) return true;
+
+    return false;
       });
     }
 
