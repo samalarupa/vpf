@@ -282,7 +282,7 @@ export default function PropertyDetail() {
           </div>
 
           <div className="flex gap-3">
-            <button
+            {/* <button
               onClick={() => setIsSaved(!isSaved)}
               className="h-12 w-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110"
               style={{
@@ -295,7 +295,7 @@ export default function PropertyDetail() {
                 color={GOLD}
                 fill={isSaved ? GOLD : "none"}
               />
-            </button>
+            </button> */}
             <button
               className="h-12 w-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110"
               style={{
