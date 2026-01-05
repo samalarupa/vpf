@@ -1,4 +1,4 @@
-import { MapPin, Bed, Home, ArrowRight, Heart } from "lucide-react";
+import { MapPin, Bed, Home, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 /* Matching the homepage color palette */
@@ -37,7 +37,7 @@ export default function PropertyCard({ item }) {
       </div>
 
       {/* Save Button */}
-      <button 
+      {/* <button 
         onClick={() => setIsSaved(!isSaved)}
         className="absolute right-5 top-5 z-10 p-2.5 rounded-full backdrop-blur-md hover:scale-110 transition-transform" 
         style={{ backgroundColor: `${BG}B3` }}
@@ -48,7 +48,7 @@ export default function PropertyCard({ item }) {
           color={GOLD} 
           fill={isSaved ? GOLD : "none"}
         />
-      </button>
+      </button> */}
 
       {/* Image Container */}
       <div className="relative overflow-hidden">

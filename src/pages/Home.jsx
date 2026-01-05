@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import {
   Phone,
   ArrowRight,
-  Heart,
   Youtube,
+  Instagram,
   Star,
   ChevronDown,
   Layers,
@@ -18,7 +18,6 @@ import {
   Sparkles,
   Award,
   ArrowUp,
-  Sun,
   Moon,
   Search,
 } from "lucide-react";
@@ -291,7 +290,7 @@ const onSearchKeyDown = (e) => {
       }}
     >
       {/* Theme Toggle */}
-      <button
+      {/* <button
         onClick={toggleTheme}
         className="fixed top-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-110 shadow-lg"
         style={{
@@ -300,8 +299,8 @@ const onSearchKeyDown = (e) => {
           color: theme.GOLD,
         }}
       >
-        {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-      </button>
+        {/* {isDarkMode ? <Sun size={20} /> : <Moon size={20} />} */}
+      {/* </button> */} */}
 
       {/* Scroll to Top */}
       <motion.button
@@ -628,11 +627,28 @@ const onSearchKeyDown = (e) => {
                     backgroundColor: `${theme.ACCENT}40`,
                   }}
                 >
+                  
                   <Youtube className="h-5 w-5" color={theme.GOLD} />
                   Video Tours
                 </a>
+                <a
+  href="https://www.instagram.com/vpfproperties?igsh=NW16aWh3ajZ5b2R3"
+  target="_blank"
+  rel="noreferrer"
+  className="px-6 py-4 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
+  style={{
+    border: `1.5px solid ${theme.GOLD}60`,
+    color: theme.TEXT,
+    backgroundColor: `${theme.ACCENT}40`,
+  }}
+>
+  <Instagram className="h-5 w-5" color={theme.GOLD} />
+  Instagram
+</a>
+
               </div>
             </motion.div>
+            
 
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 32 }}
@@ -697,7 +713,7 @@ const onSearchKeyDown = (e) => {
 
           <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-4 max-w-3xl mt-16">
             {[
-              ["250+", "Site Visits", "Curated Tours"],
+              // ["250+", "Site Visits", "Curated Tours"],
               ["120+", "Happy Families", "Satisfied Clients"],
               ["30+", "Prime Localities", "Across Hyderabad"],
             ].map(([n, l, sub]) => (
@@ -836,7 +852,7 @@ const onSearchKeyDown = (e) => {
                 style={{ backgroundColor: `${theme.BG}B3` }}
                 aria-label="Save"
               >
-                <Heart className="h-4 w-4" color={theme.GOLD} />
+                {/* <Heart className="h-4 w-4" color={theme.GOLD} /> */}
               </button>
               <div className="relative overflow-hidden">
                 <img src={p.image} alt={p.title} className="w-full h-60 object-cover transition-transform duration-700 group-hover:scale-110" />

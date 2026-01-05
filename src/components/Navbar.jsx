@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { Home, Phone, Youtube, Crown, Menu, X, } from "lucide-react";
+import { Home, Phone, Youtube,Instagram, Crown, Menu, X, } from "lucide-react";
 import { useState } from "react";
 import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext";
@@ -96,9 +96,21 @@ export default function Navbar() {
             className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/5 flex items-center gap-2"
             style={{ color: TEXT }}
           >
+
             <Youtube className="h-4 w-4" style={{ color: GOLD }} />
             YouTube
           </a>
+          <a
+  href="https://www.instagram.com/vpfproperties?igsh=NW16aWh3ajZ5b2R3"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/5 flex items-center gap-2"
+  style={{ color: TEXT }}
+>
+  <Instagram className="h-4 w-4" style={{ color: GOLD }} />
+  Instagram
+</a>
+
           <a
             href={`tel:${settings.phone_number}`}
             className="ml-3 px-6 py-3 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
@@ -163,6 +175,17 @@ export default function Navbar() {
               <Youtube className="h-4 w-4" style={{ color: GOLD }} />
               YouTube
             </a>
+            <a
+  href="https://www.instagram.com/vpfproperties?igsh=NW16aWh3ajZ5b2R3"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/5 flex items-center justify-center gap-2"
+  style={{ color: TEXT }}
+>
+  <Instagram className="h-4 w-4" style={{ color: GOLD }} />
+  Instagram
+</a>
+
             <a
               href="tel:+919999999999"
               className="px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 flex items-center justify-center gap-2 mt-2"
