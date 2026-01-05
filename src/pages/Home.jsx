@@ -289,19 +289,7 @@ const onSearchKeyDown = (e) => {
              linear-gradient(180deg, ${theme.BG} 0%, #F0F2F5 100%)`,
       }}
     >
-      {/* Theme Toggle */}
-      {/* <button
-        onClick={toggleTheme}
-        className="fixed top-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-110 shadow-lg"
-        style={{
-          backgroundColor: `${theme.ACCENT}E6`,
-          border: `1.5px solid ${theme.GOLD}40`,
-          color: theme.GOLD,
-        }}
-      >
-        {/* {isDarkMode ? <Sun size={20} /> : <Moon size={20} />} */}
-      {/* </button> */} */}
-
+      
       {/* Scroll to Top */}
       <motion.button
         onClick={scrollToTop}
