@@ -113,19 +113,19 @@ export default function Properties() {
   }, []);
 
   // read initial filters from URL (?locality=...&q=...)
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const localityParam = params.get("locality")?.trim();
-    const qParam = params.get("q")?.trim();
-    const newFilters = {};
+ useEffect(() => {
+  const params = new URLSearchParams(location.search);
 
-    if (localityParam) newFilters.locality = localityParam;
-    if (qParam) newFilters.q = qParam;
+  const newFilters = {
+    q: params.get("q")?.trim() || "",
+    locality: params.get("locality")?.trim() || "All",
+    bedrooms: params.get("bedrooms")?.trim() || "Any",
+    type: params.get("type")?.trim() || "Any",
+  };
 
-    if (Object.keys(newFilters).length > 0) {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
-    }
-  }, [location.search]);
+  setFilters((prev) => ({ ...prev, ...newFilters }));
+}, [location.search]);
+
 
   // ------------------------------------------------------
   // 2) Filtering & Sorting (uses normalized DB data)
@@ -141,9 +141,13 @@ export default function Properties() {
     if (maxPrice) {
       list = list.filter((p) => p.priceLakh <= Number(maxPrice));
     }
-    if (locality && locality !== "All") {
-      list = list.filter((p) => p.locality === locality);
-    }
+   if (locality && locality !== "All") {
+  const loc = String(locality).trim().toLowerCase();
+  list = list.filter(
+    (p) => String(p.locality || "").trim().toLowerCase() === loc
+  );
+}
+
 
     // BHK filter (robust against "3", "3 BHK", "3BHK", etc.)
     if (bedrooms && bedrooms !== "Any") {
@@ -183,9 +187,13 @@ export default function Properties() {
       });
     }
 
-    if (type && type !== "Any") {
-      list = list.filter((p) => p.property_type === type);
-    }
+   if (type && type !== "Any") {
+  const t = String(type).trim().toLowerCase();
+  list = list.filter(
+    (p) => String(p.property_type || "").trim().toLowerCase() === t
+  );
+}
+
 
     if (q) {
       const query = q.toLowerCase();
@@ -347,13 +355,16 @@ export default function Properties() {
 
           {/* Filters */}
           <div className="mt-10">
-            <FiltersBar
-              data={properties}
-              onChange={setFilters}
-              types={types}
-              initialQ={filters.q}
-              initialLocality={filters.locality}
-            />
+          <FiltersBar
+  data={properties}
+  onChange={setFilters}
+  types={types}
+  initialQ={filters.q}
+  initialLocality={filters.locality}
+  initialBedrooms={filters.bedrooms}
+  initialType={filters.type}
+/>
+
           </div>
 
           {/* Count */}

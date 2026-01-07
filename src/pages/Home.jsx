@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import FiltersBar from "../components/FiltersBar"; // adjust path
 import { Link } from "react-router-dom";
 import {
   Phone,
@@ -124,6 +125,36 @@ export default function Home() {
   const [videos, setVideos] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [activeVideoId, setActiveVideoId] = useState(null);
+  const [propertiesData, setPropertiesData] = useState([]);
+const [typesData, setTypesData] = useState([]);
+
+useEffect(() => {
+  async function loadFilterData() {
+    try {
+      const [propsRes, typesRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/properties/list.php`),
+        fetch(`${API_BASE_URL}/property_types/list.php`),
+      ]);
+
+      const propsJson = propsRes.ok ? await propsRes.json() : [];
+      const typesJson = typesRes.ok ? await typesRes.json() : [];
+
+      setPropertiesData(Array.isArray(propsJson) ? propsJson : []);
+      setTypesData(
+        Array.isArray(typesJson)
+          ? typesJson.map((t) => (t.name || "").trim()).filter(Boolean)
+          : []
+      );
+    } catch (e) {
+      console.error("Failed to load filter data:", e);
+      setPropertiesData([]);
+      setTypesData([]);
+    }
+  }
+
+  loadFilterData();
+}, []);
+
   
 
   useEffect(() => {
@@ -393,97 +424,71 @@ const onSearchKeyDown = (e) => {
           </motion.div>
 
           {/* Filter Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div
-              className="rounded-2xl p-5 backdrop-blur-xl shadow-2xl border"
-              style={{
-                background: isDarkMode 
-                  ? `linear-gradient(135deg, ${theme.SURFACE}F0 0%, ${theme.ACCENT}F0 100%)`
-                  : `${theme.SURFACE}F5`,
-                borderColor: theme.LINE,
-              }}
-            >
-              {/* Tabs */}
-              {/* <div className="flex gap-1 mb-4 border-b pb-3" style={{ borderColor: theme.LINE }}>
-                {[
-                  { id: "buy", label: "Buy" },
-                  { id: "rent", label: "Rent" },
-                  { id: "commercial", label: "Commercial" },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className="px-5 py-2 rounded-lg font-semibold text-sm transition-all duration-300 flex-1"
-                    style={{
-                      background: activeTab === tab.id 
-                        ? `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`
-                        : "transparent",
-                      color: activeTab === tab.id ? theme.BG : theme.MUTED,
-                    }}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div> */}
 
-              {/* Search Input */}
-  <div className="mb-4">
-    <div className="relative">
-      <input
-        type="text"
-        placeholder="Search upto 3 localities or landmarks"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyDown={onSearchKeyDown}
-        className="w-full px-4 py-3 pr-32 rounded-xl text-sm outline-none transition-all"
-        style={{
-          backgroundColor: theme.BG,
-          border: `1px solid ${theme.LINE}`,
-          color: theme.TEXT,
-        }}
-      />
-      <button
-        onClick={onSearchClick}
-        className="absolute right-1 top-1 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-transform hover:scale-105"
-        style={{
-          background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
-          color: theme.BG,
-        }}
-      >
-        <Search size={16} />
-        Search
-      </button>
+
+<FiltersBar
+  data={propertiesData}
+  types={typesData}
+  showPriceRange={false}
+  showApply={true}
+  autoApply={false}
+  showSearchButton={true}
+  leftOfApply={
+  <div className="flex flex-col gap-2 pt-1">
+    {/* Label */}
+    <span
+      className="text-[11px] font-semibold tracking-wide uppercase"
+      style={{ color: theme.MUTED }}
+    >
+      Popular areas
+    </span>
+
+    {/* Chips */}
+    <div className="flex flex-wrap items-center gap-2">
+      {POPULAR_LOCALITIES.map((loc) => (
+        <button
+          key={loc}
+          type="button"
+          onClick={() =>
+            navigate(
+              `/properties?${new URLSearchParams({ q: loc }).toString()}`
+            )
+          }
+          className="px-3 py-1.5 rounded-full text-xs font-medium transition-all
+                     hover:scale-105 hover:shadow-md"
+          style={{
+            background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+            border: `1px solid ${theme.GOLD}30`,
+            color: theme.TEXT,
+          }}
+        >
+          {loc}
+        </button>
+      ))}
     </div>
   </div>
+}
+
+  onApply={({ q, locality, bedrooms, type }) => {
+    const params = new URLSearchParams();
+    const q2 = (q || "").trim();
+    const loc2 = (locality || "").trim();
+    const type2 = (type || "").trim();
+    const beds2 = (bedrooms || "").trim();
+
+    if (q2) params.set("q", q2);
+    if (loc2 && loc2 !== "All") params.set("locality", loc2);
+    if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
+    if (type2 && type2 !== "Any") params.set("type", type2);
+
+    navigate(`/properties?${params.toString()}`);
+  }}
+/>
 
 
-              {/* Popular Localities */}
-              <div className="flex flex-wrap items-center gap-2">
-    <span className="text-xs font-semibold" style={{ color: theme.MUTED }}>
-      Popular Localities:
-    </span>
-    {POPULAR_LOCALITIES.map((loc) => (
-      <button
-        key={loc}
-        onClick={() => goToPropertiesWithLocality(loc)}
-        className="px-2.5 py-1 rounded text-xs font-medium transition-all hover:scale-105"
-        style={{
-          backgroundColor: `${theme.ACCENT}80`,
-          border: `1px solid ${theme.GOLD}30`,
-          color: theme.TEXT,
-        }}
-      >
-        {loc}
-      </button>
-    ))}
-  </div>
-            </div>
-          </motion.div>
+
+
+
 
           {/* Trust Indicators */}
           <motion.div
