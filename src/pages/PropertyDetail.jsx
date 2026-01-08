@@ -109,27 +109,10 @@ const copyLink = async () => {
 };
 
 const handleShare = async () => {
-  const isMobile =
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-
-  // use native share ONLY on mobile
-  if (isMobile && navigator.share) {
-    try {
-      await navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      });
-      return;
-    } catch {
-      // user cancelled -> fallback
-    }
-  }
-
-  // desktop -> open your styled modal
+  
   setShareOpen(true);
 };
+
 
 
 
