@@ -6,7 +6,6 @@ import {
   ArrowRight,
   MapPin,
   Ruler,
-  Heart,
   Share2,
   ShieldCheck,
   Phone,
@@ -20,7 +19,14 @@ import {
   Award,
   Crown,
   ChevronRight,
+  X,
+  Copy,
+  QrCode,
+  Mail,
+  MessageCircle,
+  Linkedin,
 } from "lucide-react";
+
 import { API_BASE_URL } from "../config";
 import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext";
@@ -74,6 +80,57 @@ export default function PropertyDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [idx, setIdx] = useState(0);
   const site = useContext(SiteSettingsContext);
+  const [shareOpen, setShareOpen] = useState(false);
+const [copied, setCopied] = useState(false);
+
+const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+const shareTitle = property?.title ? `Property: ${property.title}` : "Property";
+const shareText = property?.title
+  ? `Check this property: ${property.title}`
+  : "Check this property";
+
+const copyLink = async () => {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = shareUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1400);
+  } catch {
+    window.prompt("Copy this link:", shareUrl);
+  }
+};
+
+const handleShare = async () => {
+  const isMobile =
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+
+  // use native share ONLY on mobile
+  if (isMobile && navigator.share) {
+    try {
+      await navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+      });
+      return;
+    } catch {
+      // user cancelled -> fallback
+    }
+  }
+
+  // desktop -> open your styled modal
+  setShareOpen(true);
+};
+
 
 
   useEffect(() => {
@@ -106,6 +163,14 @@ export default function PropertyDetail() {
 
     fetchProperty();
   }, [id]);
+  useEffect(() => {
+  if (!shareOpen) return;
+  const prev = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+  return () => {
+    document.body.style.overflow = prev;
+  };
+}, [shareOpen]);
 
   // loading state
   if (loading) {
@@ -296,15 +361,19 @@ export default function PropertyDetail() {
                 fill={isSaved ? GOLD : "none"}
               />
             </button> */}
-            <button
-              className="h-12 w-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110"
-              style={{
-                background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
-                border: `1px solid ${LINE}`,
-              }}
-            >
-              <Share2 size={20} color={GOLD} />
-            </button>
+           <button
+  type="button"
+  onClick={handleShare}
+  className="h-12 w-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all hover:scale-110"
+  style={{
+    background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
+    border: `1px solid ${LINE}`,
+  }}
+  aria-label="Share property"
+>
+  <Share2 size={20} color={GOLD} />
+</button>
+
           </div>
         </motion.div>
 
@@ -648,6 +717,17 @@ export default function PropertyDetail() {
           </motion.section>
         )}
       </div>
+      <ShareModal
+  open={shareOpen}
+  onClose={() => setShareOpen(false)}
+  title={shareTitle}
+  text={shareText}
+  url={shareUrl}
+  copied={copied}
+  onCopy={copyLink}
+/>
+
+
     </div>
   );
 }
@@ -682,6 +762,305 @@ function Feature({ icon: Icon, label, value }) {
           {value}
         </div>
       </div>
+      
+
+    </div>
+  );
+  
+
+
+
+
+
+
+}
+function ShareModal({ open, onClose, title, text, url, copied, onCopy }) {
+  if (!open) return null;
+
+  const msg = `${text}\n${url}`;
+
+  const shareTargets = [
+  {
+    label: "WhatsApp",
+    icon: WhatsAppIcon,
+    href: `https://wa.me/?text=${encodeURIComponent(msg)}`,
+    accent: "gold",
+  },
+  {
+    label: "Telegram",
+    icon: TelegramIcon,
+    href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    accent: "gold",
+  },
+  {
+    label: "Email",
+    icon: Mail,
+    href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(msg)}`,
+    accent: "gold",
+  },
+  {
+    label: "SMS",
+    icon: MessageCircle,
+    href: `sms:?&body=${encodeURIComponent(msg)}`,
+    accent: "gold",
+  },
+  {
+    label: "LinkedIn",
+    icon: LinkedInIcon,
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    accent: "gold",
+  },
+  {
+    label: "Facebook",
+    icon: FacebookIcon,
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    accent: "gold",
+  },
+  
+];
+
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      onClick={onClose}
+      style={{ background: "rgba(0,0,0,0.62)", backdropFilter: "blur(10px)" }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 12, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-[640px] rounded-[20px] overflow-hidden"
+        style={{
+          border: `1px solid ${LINE}`,
+          boxShadow: `0 40px 120px rgba(0,0,0,.75)`,
+          background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
+        }}
+      >
+        {/* Top bar (compact) */}
+        <div
+          className="px-5 py-4 flex items-center justify-between"
+          style={{ borderBottom: `1px solid ${LINE}` }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="px-3 py-1.5 rounded-full text-xs font-black"
+              style={{
+                background: `linear-gradient(135deg, ${GOLD}E6 0%, ${GOLD_D}E6 100%)`,
+                color: BG,
+              }}
+            >
+              Share
+            </div>
+
+            <div>
+              {/* <div className="text-sm font-black" style={{ color: TEXT }}>
+                Share property
+              </div> */}
+              <div className="text-xs" style={{ color: MUTED }}>
+                Copy link or choose an app
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-10 w-10 rounded-2xl grid place-items-center transition-all hover:scale-105"
+            style={{
+              backgroundColor: `${BG}A6`,
+              border: `1px solid ${LINE}`,
+            }}
+            aria-label="Close"
+          >
+            <X size={18} color={TEXT} />
+          </button>
+        </div>
+
+        {/* Body (short) */}
+        <div className="p-5">
+          {/* Copy row (tight) */}
+          <div
+            className="rounded-2xl p-3 flex items-center gap-3"
+            style={{
+              backgroundColor: `${BG}66`,
+              border: `1px solid ${LINE}`,
+            }}
+          >
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] font-semibold mb-1 px-2" style={{ color: MUTED }}>
+                Shareable link
+              </div>
+
+              <div
+                className="rounded-xl px-3 py-2 text-sm truncate"
+                style={{
+                  backgroundColor: `${BG}B3`,
+                  border: `1px solid ${LINE}`,
+                  color: TEXT,
+                }}
+                title={url}
+              >
+                {url}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onCopy}
+              className="h-8 px-4 py-4 rounded-xl font-black flex items-center gap-1 mt-5 transition-all hover:scale-[1.02]"
+              style={{
+                background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`,
+                color: BG,
+                border: `1px solid ${GOLD}35`,
+                boxShadow: `0 12px 26px ${GOLD}20`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Copy size={10} />
+              Copy
+            </button>
+          </div>
+
+          {/* small copied toast (below, not taking space) */}
+          <div
+            className="mt-2 text-[11px] font-semibold"
+            style={{
+              color: GOLD,
+              opacity: copied ? 1 : 0,
+              transform: copied ? "translateY(0)" : "translateY(-4px)",
+              transition: "all .18s ease",
+              height: 14,
+            }}
+          >
+            Copied ✓
+          </div>
+
+          {/* Icon grid only */}
+          <div
+            className="mt-3 rounded-2xl p-4"
+            style={{
+              backgroundColor: `${BG}66`,
+              border: `1px solid ${LINE}`,
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-black" style={{ color: TEXT }}>
+                Share via
+              </div>
+              
+            </div>
+
+          <div className="flex flex-wrap justify-center"
+  style={{ gap: 40 }}>
+  
+
+  {shareTargets.map((s) => (
+    <ShareTile key={s.label} {...s} />
+  ))}
+</div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
+
+
+
+function ShareTile({ label, icon: Icon, href, accent = "line" }) {
+  const border = accent === "gold" ? `1px solid ${GOLD}55` : `1px solid ${LINE}`;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="group relative grid place-items-center rounded-2xl transition-all hover:-translate-y-0.5 active:translate-y-0"
+      style={{
+        height: 46,
+        width: 46,
+        background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
+        border,
+        boxShadow:
+          accent === "gold"
+            ? `0 14px 40px ${GOLD}14`
+            : `0 14px 40px rgba(0,0,0,.30)`,
+      }}
+      aria-label={label}
+      title={label}
+    >
+      {/* IMPORTANT: custom icons like WhatsAppIcon are components too */}
+      <Icon size={18} color={accent === "gold" ? GOLD : MUTED} />
+
+      <span
+        className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-semibold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{
+          backgroundColor: `${BG}E6`,
+          border: `1px solid ${LINE}`,
+          color: TEXT,
+        }}
+      >
+        {label}
+      </span>
+    </a>
+  );
+}
+
+const BrandIcon = ({ children }) => (
+  <span className="inline-grid place-items-center">{children}</span>
+);
+
+const WhatsAppIcon = ({ size = 18, color = GOLD }) => (
+  <BrandIcon>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M20.52 3.48A11.91 11.91 0 0 0 12.01 0C5.38 0 .01 5.37.01 12c0 2.11.55 4.17 1.6 5.98L0 24l6.2-1.6a11.93 11.93 0 0 0 5.81 1.48h.01c6.63 0 12-5.37 12-12 0-3.2-1.25-6.2-3.5-8.4ZM12.02 22a9.95 9.95 0 0 1-5.08-1.39l-.36-.21-3.68.95.98-3.58-.24-.37A9.95 9.95 0 1 1 12.02 22Zm5.78-7.44c-.31-.15-1.85-.91-2.14-1.02-.29-.11-.5-.15-.71.15-.21.31-.82 1.02-1 1.23-.19.21-.37.23-.68.08-.31-.15-1.31-.48-2.49-1.54-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.13-.63.14-.14.31-.37.46-.55.15-.19.21-.31.31-.52.1-.21.05-.4-.03-.55-.08-.15-.71-1.71-.97-2.34-.26-.62-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.4-.29.31-1.1 1.07-1.1 2.62 0 1.54 1.13 3.03 1.29 3.24.15.21 2.22 3.39 5.39 4.75.75.32 1.33.51 1.78.65.75.24 1.43.21 1.97.13.6-.09 1.85-.76 2.11-1.49.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.36Z"
+        fill={color}
+      />
+    </svg>
+  </BrandIcon>
+);
+
+const TelegramIcon = ({ size = 18, color = GOLD }) => (
+  <BrandIcon>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M21.8 3.4c.3-.1.6.1.7.4.1.2.1.4 0 .6L16.9 21c-.1.3-.4.5-.7.5-.2 0-.4-.1-.6-.2l-4.3-3.2-2.1 2c-.2.2-.4.2-.6.2-.2 0-.3-.1-.4-.2-.1-.1-.2-.3-.2-.5v-3l9.4-8.6c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7-.1L5.2 13.1 1.9 12c-.3-.1-.5-.4-.5-.7 0-.3.2-.6.5-.7L21.8 3.4Z"
+        fill={color}
+      />
+    </svg>
+  </BrandIcon>
+);
+
+const LinkedInIcon = ({ size = 18, color = GOLD }) => (
+  <BrandIcon>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.5 23.5h4V7.5h-4v16ZM8.5 7.5h3.8v2.2h.1c.5-1 1.9-2.2 3.9-2.2 4.2 0 5 2.7 5 6.3v9.7h-4v-8.6c0-2.1 0-4.8-2.9-4.8-2.9 0-3.4 2.3-3.4 4.7v8.7h-4V7.5Z"
+        fill={color}
+      />
+    </svg>
+  </BrandIcon>
+);
+
+const FacebookIcon = ({ size = 18, color = GOLD }) => (
+  <BrandIcon>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-label="Facebook"
+    >
+      <path
+        d="M24 12.07C24 5.405 18.627 0 12 0S0 5.405 0 12.07C0 18.092 4.388 23.073 10.125 24v-8.437H7.078v-3.493h3.047V9.41c0-3.035 1.792-4.714 4.533-4.714 1.313 0 2.686.236 2.686.236v2.98h-1.512c-1.49 0-1.953.93-1.953 1.886v2.272h3.328l-.532 3.493h-2.796V24C19.612 23.073 24 18.092 24 12.07Z"
+        fill={color}
+      />
+    </svg>
+  </BrandIcon>
+);
+
+
+
