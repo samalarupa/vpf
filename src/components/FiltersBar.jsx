@@ -267,6 +267,33 @@ export default function FiltersBar({
   </select>
 </div>
 
+{/* Type */}
+<div className={`${showPriceRange ? "col-span-2" : "col-span-2"}`}>
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Type
+  </label>
+  <select
+    value={type}
+    onChange={(e) => setType(e.target.value)}
+    className={`w-full py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none ${
+      showPriceRange ? "px-4" : "px-4"
+    }`}
+    
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem",
+    }}
+  >
+    <option value="Any">Any</option>
+    {(types?.length ? types : ["Flat", "Villa", "Plot"]).map((t) => (
+      <option key={t} value={t}>{t}</option>
+    ))}
+  </select>
+</div>
+
 {/* Bedrooms */}
 <div className={`${showPriceRange ? "col-span-1" : "col-span-2"}`}>
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
@@ -292,35 +319,8 @@ export default function FiltersBar({
   </select>
 </div>
 
-{/* Type */}
-<div className={`${showPriceRange ? "col-span-1" : "col-span-2"}`}>
-  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-    Type
-  </label>
-  <select
-    value={type}
-    onChange={(e) => setType(e.target.value)}
-    className={`w-full py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none ${
-      showPriceRange ? "px-3" : "px-4"
-    }`}
-    
-    style={{
-      ...inputStyle,
-      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "right 1rem center",
-      paddingRight: "3rem",
-    }}
-  >
-    <option value="Any">Any</option>
-    {(types?.length ? types : ["Flat", "Villa", "Plot"]).map((t) => (
-      <option key={t} value={t}>{t}</option>
-    ))}
-  </select>
-</div>
-
 {/* Search */}
-<div className={`${showPriceRange ? "col-span-4" : "col-span-4"}`}>
+<div className={`${showPriceRange ? "col-span-3" : "col-span-4"}`}>
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
     Search
   </label>
@@ -337,14 +337,14 @@ export default function FiltersBar({
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search by title or locality..."
-        className={`w-full pl-12 pr-4 py-3 rounded-l-xl rounded-r-none text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+        className={`w-full pl-12 pr-4 py-3 outline-gray-800 outline-1 outline-r-none rounded-l-xl rounded-r-none text-sm font-medium  focus:ring-2 ${placeholderClass}`}
         style={inputStyle}
       />
     </div>
 
     <button
       onClick={handleApply}
-      className="px-2 py-3 rounded-r-xl font-semibold"
+      className="px-2 py-2.5 rounded-r-xl font-semibold"
       style={{ background: GOLD, color: "black" }}
     >
       Search
