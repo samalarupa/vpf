@@ -469,20 +469,23 @@ const onSearchKeyDown = (e) => {
   </div>
 }
 
-  onApply={({ q, locality, bedrooms, type }) => {
-    const params = new URLSearchParams();
-    const q2 = (q || "").trim();
-    const loc2 = (locality || "").trim();
-    const type2 = (type || "").trim();
-    const beds2 = (bedrooms || "").trim();
+onApply={({ q, locality, bedrooms, type, nearby }) => {
+  const params = new URLSearchParams();
 
-    if (q2) params.set("q", q2);
-    if (loc2 && loc2 !== "All") params.set("locality", loc2);
-    if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
-    if (type2 && type2 !== "Any") params.set("type", type2);
+  const q2 = (q || "").trim();
+  const loc2 = (locality || "").trim();
+  const beds2 = (bedrooms || "").trim();
+  const type2 = (type || "").trim();
+  const near2 = (nearby || "").trim();
 
-    navigate(`/properties?${params.toString()}`);
-  }}
+  if (q2) params.set("q", q2);
+  if (loc2 && loc2 !== "All") params.set("locality", loc2);
+  if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
+  if (type2 && type2 !== "Any") params.set("type", type2);
+  if (near2 && near2 !== "Any") params.set("nearby", near2);
+
+  navigate(`/properties?${params.toString()}`);
+}}
 />
 
 

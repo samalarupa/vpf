@@ -135,6 +135,7 @@ const handleShare = async () => {
             availability: data.availability,
             status: data.status,
             bedrooms: data.bedrooms,
+            nearby: data.nearby_locations,
           });
         }
       } catch (err) {
@@ -222,6 +223,12 @@ const handleShare = async () => {
     plotSize,
     videoUrl,
   } = property;
+
+  const nearbyList = (property.nearby || "")
+  .split(",")
+  .map(x => x.trim())
+  .filter(Boolean);
+
 
   const images = property.images || (image ? [image] : []);
   const next = () => setIdx((i) => (i + 1) % images.length);
@@ -481,6 +488,47 @@ const handleShare = async () => {
                 )}
               </div>
             </div>
+
+            {nearbyList.length > 0 && (
+  <div
+    className="rounded-3xl p-8 backdrop-blur-sm"
+    style={{
+      background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
+      border: `1px solid ${LINE}`,
+    }}
+  >
+    <h2 className="text-2xl font-bold mb-6" style={{ color: TEXT }}>
+      Nearby Locations
+    </h2>
+
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {nearbyList.map((place, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 p-4 rounded-2xl"
+          style={{
+            backgroundColor: `${ACCENT}60`,
+            border: `1px solid ${LINE}`,
+          }}
+        >
+          <div
+            className="h-12 w-12 rounded-xl flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${GOLD}20 0%, ${GOLD}10 100%)`,
+              border: `1px solid ${GOLD}30`,
+            }}
+          >
+            <MapPin size={20} style={{ color: GOLD }} />
+          </div>
+
+          <div className="text-base font-semibold" style={{ color: TEXT }}>
+            {place}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
             {/* Description */}
             <div

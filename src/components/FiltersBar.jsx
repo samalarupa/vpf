@@ -21,6 +21,7 @@ export default function FiltersBar({
   initialLocality = "",
   initialBedrooms = "Any",
   initialType = "Any",
+  initialNearby = "Any",
 
   // controls
   showPriceRange = true, // homepage: false
@@ -33,6 +34,9 @@ export default function FiltersBar({
   const [bedrooms, setBedrooms] = useState(initialBedrooms || "Any");
   const [type, setType] = useState(initialType || "Any");
   const [q, setQ] = useState(initialQ || "");
+  const [nearby, setNearby] = useState(initialNearby || "Any");
+
+
 
   const debounceRef = useRef(null);
 
@@ -40,6 +44,21 @@ export default function FiltersBar({
     const set = new Set((data || []).map((d) => d?.locality).filter(Boolean));
     return ["All", ...Array.from(set)];
   }, [data]);
+
+  const nearbyOptions = useMemo(() => {
+    const set = new Set();
+  
+    (data || []).forEach((p) => {
+      (p.nearby_locations || "")
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean)
+        .forEach((x) => set.add(x));
+    });
+  
+    return ["Any", ...Array.from(set)];
+  }, [data]);
+  
 
   const onlyNum = (val) => (val === "" ? "" : String(val).replace(/[^\d]/g, ""));
 
@@ -49,6 +68,7 @@ export default function FiltersBar({
     locality,
     bedrooms,
     type,
+    nearby,
     q: q.trim(),
   });
 
@@ -59,6 +79,7 @@ export default function FiltersBar({
     setBedrooms("Any");
     setType("Any");
     setQ("");
+    setNearby("Any");
 
     // If autoApply is OFF (homepage), still let parent know (optional)
     if (!autoApply) {
@@ -68,6 +89,7 @@ export default function FiltersBar({
         locality: "All",
         bedrooms: "Any",
         type: "Any",
+        
         q: "",
       });
     }
@@ -78,6 +100,7 @@ export default function FiltersBar({
     locality !== "All" ||
     bedrooms !== "Any" ||
     type !== "Any" ||
+    nearby !== "Any" ||
     q;
 
   // Auto-emit immediately for non-text filters
@@ -85,7 +108,7 @@ export default function FiltersBar({
     if (!autoApply) return;
     onChange?.(getPayload());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [minPrice, maxPrice, locality, bedrooms, type, showPriceRange, autoApply]);
+  }, [minPrice, maxPrice, locality, bedrooms, type, nearby, showPriceRange, autoApply]);
 
   // Auto-emit debounced for text search
   useEffect(() => {
@@ -119,6 +142,7 @@ export default function FiltersBar({
     locality,
     bedrooms,
     type,
+    nearby,
     // include any other filter states you already use in FiltersBar
   });
 };
@@ -244,6 +268,32 @@ export default function FiltersBar({
             ))}
           </select>
         </div>
+
+        {/* Nearby */}
+<div className="relative">
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Nearby
+  </label>
+  <select
+    value={nearby}
+    onChange={(e) => setNearby(e.target.value)}
+    className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem",
+    }}
+  >
+    {nearbyOptions.map((n) => (
+      <option key={n} value={n}>
+        {n}
+      </option>
+    ))}
+  </select>
+</div>
+
 
         {/* Type */}
         <div className="relative">

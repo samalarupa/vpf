@@ -66,7 +66,6 @@ export default function Properties() {
         const typesData = typesRes.ok ? await typesRes.json() : null;
 
         const normalized = data.map((p) => {
-          // try a number of possible fields the backend might use
           const rawRooms =
             p.bedrooms ??
             p.rooms ??
@@ -79,18 +78,24 @@ export default function Properties() {
             p.room ??
             "";
         
+          const rawNearby =
+            p.nearby_locations ??
+            p.nearby ??
+            p.nearby_places ??
+            p.nearby_place ??
+            "";
+        
           return {
             ...p,
             priceLakh: Number(p.price_lakh || 0),
+            nearby_locations: String(rawNearby),
             image: p.image_url || null,
-            // ensure property_type is a clean string
             property_type: (p.property_type || "").trim(),
-            // normalized numeric bedrooms for filtering
             bedrooms: parseBedrooms(rawRooms),
-            // keep rawRooms for fallback + debugging
             rooms_raw: rawRooms,
           };
         });
+        
         
 
         setProperties(normalized);
@@ -121,6 +126,7 @@ export default function Properties() {
     locality: params.get("locality")?.trim() || "All",
     bedrooms: params.get("bedrooms")?.trim() || "Any",
     type: params.get("type")?.trim() || "Any",
+    nearby: params.get("nearby")?.trim() || "Any",
   };
 
   setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -133,7 +139,7 @@ export default function Properties() {
   const filtered = useMemo(() => {
     let list = [...properties];
 
-    const { minPrice, maxPrice, locality, bedrooms, type, q } = filters;
+    const { minPrice, maxPrice, locality, bedrooms, type, nearby, q } = filters;
 
     if (minPrice) {
       list = list.filter((p) => p.priceLakh >= Number(minPrice));
@@ -194,13 +200,33 @@ export default function Properties() {
   );
 }
 
+if (nearby && nearby !== "Any") {
+  const selected = nearby.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  list = list.filter((p) => {
+    if (!p.nearby_locations) return false;
+
+    const values = p.nearby_locations
+      .split(",")
+      .map(x =>
+        x
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+      );
+
+    return values.some(v => v.includes(selected) || selected.includes(v));
+  });
+}
+
+
 
     if (q) {
       const query = q.toLowerCase();
       list = list.filter(
         (p) =>
           (p.title || "").toLowerCase().includes(query) ||
-          (p.locality || "").toLowerCase().includes(query)
+          (p.locality || "").toLowerCase().includes(query) ||
+          (p.nearby_locations || "").toLowerCase().includes(query)
       );
     }
 
@@ -363,6 +389,7 @@ export default function Properties() {
   initialLocality={filters.locality}
   initialBedrooms={filters.bedrooms}
   initialType={filters.type}
+  initialNearby={filters.nearby}
 />
 
           </div>
