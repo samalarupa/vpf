@@ -444,7 +444,7 @@ const onSearchKeyDown = (e) => {
     </span>
 
     {/* Chips */}
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3 mb-3">
       {POPULAR_LOCALITIES.map((loc) => (
         <button
           key={loc}

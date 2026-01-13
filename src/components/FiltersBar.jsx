@@ -25,6 +25,7 @@ export default function FiltersBar({
 
   // controls
   showPriceRange = true, // homepage: false
+  showSearch = true,
   showApply = false, // homepage: true
   autoApply = true, // properties page: true, homepage: false
 }) {
@@ -184,177 +185,179 @@ export default function FiltersBar({
       </div>
 
       {/* Filters Grid */}
-      <div className={`grid md:grid-cols-2 ${gridCols} gap-4`}>
-        {/* Min Price */}
-        {showPriceRange && (
-          <div className="relative">
-            <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-              Min Price
-            </label>
-            <input
-              value={minPrice}
-              onChange={(e) => setMinPrice(onlyNum(e.target.value))}
-              placeholder="₹ Lakh"
-              className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 ${placeholderClass}`}
-              style={inputStyle}
-              inputMode="numeric"
-            />
-          </div>
-        )}
+<div className="grid grid-cols-12 gap-3 mb-4 items-end">
 
-        {/* Max Price */}
-        {showPriceRange && (
-          <div className="relative">
-            <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-              Max Price
-            </label>
-            <input
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(onlyNum(e.target.value))}
-              placeholder="₹ Lakh"
-              className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 ${placeholderClass}`}
-              style={inputStyle}
-              inputMode="numeric"
-            />
-          </div>
-        )}
+{/* Min Price */}
+{showPriceRange && (
+  <div className="col-span-1">
+    <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+      Min Price
+    </label>
+    <input
+      value={minPrice}
+      onChange={(e) => setMinPrice(onlyNum(e.target.value))}
+      placeholder="₹ Lakh"
+      className={`w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+      style={inputStyle}
+      inputMode="numeric"
+    />
+  </div>
+)}
 
-        {/* Locality */}
-        <div className="relative">
-          <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-            Locality
-          </label>
-          <select
-            value={locality}
-            onChange={(e) => setLocality(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-            style={{
-              ...inputStyle,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              paddingRight: "3rem",
-            }}
-          >
-            {localityOptions.map((l) => (
-              <option key={l} value={l} style={{ backgroundColor: SURFACE, color: TEXT }}>
-                {l}
-              </option>
-            ))}
-          </select>
-        </div>
+{/* Max Price */}
+{showPriceRange && (
+  <div className="col-span-1">
+    <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+      Max Price
+    </label>
+    <input
+      value={maxPrice}
+      onChange={(e) => setMaxPrice(onlyNum(e.target.value))}
+      placeholder="₹ Lakh"
+      className={`w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+      style={inputStyle}
+      inputMode="numeric"
+    />
+  </div>
+)}
 
-        {/* Bedrooms */}
-        <div className="relative">
-          <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-            Bedrooms
-          </label>
-          <select
-            value={bedrooms}
-            onChange={(e) => setBedrooms(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-            style={{
-              ...inputStyle,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              paddingRight: "3rem",
-            }}
-          >
-            {["Any", "1", "2", "3", "4"].map((b) => (
-              <option key={b} value={b} style={{ backgroundColor: SURFACE, color: TEXT }}>
-                {b === "Any" ? "Any" : `${b} BHK`}
-              </option>
-            ))}
-          </select>
-        </div>
+{/* Locality */}
+<div className="col-span-2">
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Locality
+  </label>
+  <select
+    value={locality}
+    onChange={(e) => setLocality(e.target.value)}
+    className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none"
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem",
+    }}
+  >
+    {localityOptions.map((l) => (
+      <option key={l} value={l}>{l}</option>
+    ))}
+  </select>
+</div>
 
-        {/* Nearby */}
-<div className="relative">
+{/* Nearby */}
+<div className="col-span-2">
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
     Nearby
   </label>
   <select
     value={nearby}
     onChange={(e) => setNearby(e.target.value)}
-    className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+    className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none"
     style={{
       ...inputStyle,
-      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
       backgroundRepeat: "no-repeat",
       backgroundPosition: "right 1rem center",
       paddingRight: "3rem",
     }}
   >
     {nearbyOptions.map((n) => (
-      <option key={n} value={n}>
-        {n}
-      </option>
+      <option key={n} value={n}>{n}</option>
     ))}
   </select>
 </div>
 
+{/* Bedrooms */}
+<div className={`${showPriceRange ? "col-span-1" : "col-span-2"}`}>
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Bedrooms
+  </label>
+  <select
+    value={bedrooms}
+    onChange={(e) => setBedrooms(e.target.value)}
+    className={`w-full py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none ${
+      showPriceRange ? "px-3" : "px-4"
+    }`}
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem",
+    }}
+  >
+    {["Any", "1", "2", "3", "4"].map((b) => (
+      <option key={b} value={b}>{b === "Any" ? "Any" : `${b} BHK`}</option>
+    ))}
+  </select>
+</div>
 
-        {/* Type */}
-        <div className="relative">
-          <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-            Type
-          </label>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-            style={{
-              ...inputStyle,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              paddingRight: "3rem",
-            }}
-          >
-            <option value="Any" style={{ backgroundColor: SURFACE, color: TEXT }}>
-              Any
-            </option>
+{/* Type */}
+<div className={`${showPriceRange ? "col-span-1" : "col-span-2"}`}>
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Type
+  </label>
+  <select
+    value={type}
+    onChange={(e) => setType(e.target.value)}
+    className={`w-full py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none ${
+      showPriceRange ? "px-3" : "px-4"
+    }`}
+    
+    style={{
+      ...inputStyle,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "right 1rem center",
+      paddingRight: "3rem",
+    }}
+  >
+    <option value="Any">Any</option>
+    {(types?.length ? types : ["Flat", "Villa", "Plot"]).map((t) => (
+      <option key={t} value={t}>{t}</option>
+    ))}
+  </select>
+</div>
 
-            {Array.isArray(types) && types.length > 0
-              ? types.map((t) => (
-                  <option key={t} value={t} style={{ backgroundColor: SURFACE, color: TEXT }}>
-                    {t}
-                  </option>
-                ))
-              : ["Flat", "Villa", "Plot"].map((t) => (
-                  <option key={t} value={t} style={{ backgroundColor: SURFACE, color: TEXT }}>
-                    {t}
-                  </option>
-                ))}
-          </select>
-        </div>
+{/* Search */}
+<div className={`${showPriceRange ? "col-span-4" : "col-span-4"}`}>
+  <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+    Search
+  </label>
 
-        {/* Search */}
-        <div className={`relative ${showPriceRange ? "md:col-span-2" : "md:col-span-2 lg:col-span-2"}`}>
-          <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
-            Search
-          </label>
-          <div className="relative">
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: GOLD }}
-            />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by title or locality..."
-              className={`w-full pl-12 pr-4 py-3 rounded-xl text-sm font-medium transition-all focus:outline-none focus:ring-2 ${placeholderClass}`}
-              style={inputStyle}
-            />
-          </div>
-        </div>
-      </div>
+  <div className="flex w-full">
+    <div className="relative flex-1">
+      <Search
+        size={18}
+        className="absolute left-4 top-1/2 -translate-y-1/2"
+        style={{ color: GOLD }}
+      />
+
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search by title or locality..."
+        className={`w-full pl-12 pr-4 py-3 rounded-l-xl rounded-r-none text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+        style={inputStyle}
+      />
+    </div>
+
+    <button
+      onClick={handleApply}
+      className="px-2 py-3 rounded-r-xl font-semibold"
+      style={{ background: GOLD, color: "black" }}
+    >
+      Search
+    </button>
+  </div>
+</div>
+
+</div>
+
 
       {/* Apply button (Homepage use-case) */}
       {showApply && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="mt-4 flex items-center justify-between gap-3">
   <div className="min-w-0 flex-1">
     {leftOfApply}
   </div>
