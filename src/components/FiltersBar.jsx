@@ -303,14 +303,14 @@ export default function FiltersBar({
     value={bedrooms}
     onChange={(e) => setBedrooms(e.target.value)}
     className={`w-full py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 appearance-none ${
-      showPriceRange ? "px-3" : "px-4"
+      showPriceRange ? "px-4" : "px-4"
     }`}
     style={{
       ...inputStyle,
       backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23D4AF37' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
       backgroundRepeat: "no-repeat",
       backgroundPosition: "right 1rem center",
-      paddingRight: "3rem",
+      paddingRight: "2rem",
     }}
   >
     {["Any", "1", "2", "3", "4"].map((b) => (
