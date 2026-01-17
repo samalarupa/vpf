@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, Youtube, Crown, Facebook, Instagram, Linkedin, Send } from "lucide-react";
 import { useContext } from "react";
-import { SiteSettingsContext } from "../context/SiteSettingsContext";
+import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 /* Match the homepage palette */
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";

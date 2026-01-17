@@ -24,6 +24,9 @@ import {
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { API_BASE_URL } from "../config";
+import { useContext } from "react";
+import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
+
 
 /* -----------------------------
    PALETTE / TOKENS (Deep Navy + Champagne Gold + Marble White)
@@ -53,6 +56,7 @@ const LIGHT_THEME = {
 };
 
 const fmtLakh = (n) => `₹ ${Number(n).toLocaleString("en-IN")} L`;
+
 
 /* -----------------------------
    MOCK DATA
@@ -109,6 +113,11 @@ function extractYouTubeId(url) {
    PAGE
 ------------------------------ */
 export default function Home() {
+  
+const site = useContext(SiteSettingsContext);
+
+  
+
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   // const [isDarkMode, setIsDarkMode] = useState(true);
@@ -667,11 +676,17 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
                     backgroundColor: theme.SURFACE,
                   }}
                 >
-                  <img
-                    src="https://i.pinimg.com/736x/f7/7e/ac/f77eacc3c207119451c82cbdc01be703.jpg"
-                    alt="Premium Hyderabad residence"
-                    className="w-full h-[500px] object-cover"
-                  />
+                  {site?.hero_image && (
+  <img
+    src={`${API_BASE_URL}${site.hero_image}`}
+    alt="Premium Hyderabad residence"
+    className="w-full h-[500px] object-cover"
+  />
+)}
+
+
+
+
                   <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-black/60' : 'from-black/40'} via-transparent to-transparent`} />
                 </div>
 

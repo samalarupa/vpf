@@ -29,7 +29,7 @@ import {
 
 import { API_BASE_URL } from "../config";
 import { useContext } from "react";
-import { SiteSettingsContext } from "../context/SiteSettingsContext";
+import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 import ReviewForm from "../components/ReviewForm";
 
 

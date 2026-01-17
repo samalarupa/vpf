@@ -5,7 +5,7 @@ import Footer from "./components/Footer.jsx";
 import Home from "./pages/Home.jsx";
 import Properties from "./pages/Properties.jsx";
 import PropertyDetail from "./pages/PropertyDetail.jsx";
-import { SiteSettingsContext } from "./context/SiteSettingsContext";
+import { SiteSettingsContext } from "./context/SiteSettingsContext.jsx";
 import { API_BASE_URL } from "./config";
 
 export default function App() {

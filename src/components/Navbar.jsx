@@ -2,7 +2,7 @@ import { NavLink, Link } from "react-router-dom";
 import { Home, Phone, Youtube,Instagram, Crown, Menu, X, } from "lucide-react";
 import { useState } from "react";
 import { useContext } from "react";
-import { SiteSettingsContext } from "../context/SiteSettingsContext";
+import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 /* Matching the homepage color palette */
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";

@@ -4,7 +4,7 @@ import FiltersBar from "../components/FiltersBar.jsx";
 import PropertyCard from "../components/PropertyCard.jsx";
 import { Sparkles, SlidersHorizontal, ChevronRight, Home } from "lucide-react";
 import { API_BASE_URL } from "../config";
-import { SiteSettingsContext } from "../context/SiteSettingsContext";
+import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 
 // Normalize whatever backend sends into a simple number (1, 2, 3, …)
 const parseBedrooms = (value) => {
