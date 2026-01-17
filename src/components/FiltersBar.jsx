@@ -365,7 +365,7 @@ export default function FiltersBar({
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search by title or locality..."
-        className={`w-full pl-12 pr-4 py-3 outline-gray-800 outline-1 outline-r-none rounded-l-xl rounded-r-none text-sm font-medium  focus:ring-2 ${placeholderClass}`}
+        className={`w-full pl-9 pr-4 py-3 outline-gray-800 outline-1 outline-r-none rounded-l-xl rounded-r-none text-sm font-medium  focus:ring-2 ${placeholderClass}`}
         style={inputStyle}
       />
     </div>

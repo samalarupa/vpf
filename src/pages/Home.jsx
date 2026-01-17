@@ -608,7 +608,7 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
                     color: theme.BG,
                   }}
                 >
-                  <span className="relative z-10">Explore Portfolio</span>
+                  <span className="relative z-10">Explore Properties</span>
                   <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                 </Link>
