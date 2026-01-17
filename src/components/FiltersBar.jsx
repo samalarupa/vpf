@@ -188,7 +188,7 @@ export default function FiltersBar({
 <div className="grid grid-cols-12 gap-3 mb-4 items-end">
 
 {/* Min Price */}
-{showPriceRange && (
+{/* {showPriceRange && (
   <div className="col-span-1">
     <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
       Min Price
@@ -202,10 +202,24 @@ export default function FiltersBar({
       inputMode="numeric"
     />
   </div>
-)}
+)} */}
+
+<div className="col-span-1">
+    <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+      Min Price
+    </label>
+    <input
+      value={minPrice}
+      onChange={(e) => setMinPrice(onlyNum(e.target.value))}
+      placeholder="₹ Lakh"
+      className={`w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+      style={inputStyle}
+      inputMode="numeric"
+    />
+  </div>
 
 {/* Max Price */}
-{showPriceRange && (
+{/* {showPriceRange && (
   <div className="col-span-1">
     <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
       Max Price
@@ -219,7 +233,21 @@ export default function FiltersBar({
       inputMode="numeric"
     />
   </div>
-)}
+)} */}
+
+<div className="col-span-1">
+    <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
+      Max Price
+    </label>
+    <input
+      value={maxPrice}
+      onChange={(e) => setMaxPrice(onlyNum(e.target.value))}
+      placeholder="₹ Lakh"
+      className={`w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 ${placeholderClass}`}
+      style={inputStyle}
+      inputMode="numeric"
+    />
+  </div>
 
 {/* Locality */}
 <div className="col-span-2">
@@ -295,7 +323,7 @@ export default function FiltersBar({
 </div>
 
 {/* Bedrooms */}
-<div className={`${showPriceRange ? "col-span-1" : "col-span-2"}`}>
+<div className="col-span-1">
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
     Bedrooms
   </label>
@@ -320,7 +348,7 @@ export default function FiltersBar({
 </div>
 
 {/* Search */}
-<div className={`${showPriceRange ? "col-span-3" : "col-span-4"}`}>
+<div className= "col-span-3">
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
     Search
   </label>
