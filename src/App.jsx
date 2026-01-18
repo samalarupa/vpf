@@ -7,6 +7,7 @@ import Properties from "./pages/Properties.jsx";
 import PropertyDetail from "./pages/PropertyDetail.jsx";
 import { SiteSettingsContext } from "./context/SiteSettingsContext.jsx";
 import { API_BASE_URL } from "./config";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 export default function App() {
   const [settings, setSettings] = useState(null);
@@ -38,6 +39,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-[#0A0E27]">
         <Navbar />
         <main className="flex-1">
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/properties" element={<Properties />} />

@@ -164,7 +164,16 @@ useEffect(() => {
   loadFilterData();
 }, []);
 
-  
+  useEffect(() => {
+  document.documentElement.classList.add("hide-scrollbar");
+  document.body.classList.add("hide-scrollbar");
+
+  return () => {
+    document.documentElement.classList.remove("hide-scrollbar");
+    document.body.classList.remove("hide-scrollbar");
+  };
+}, []);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -316,7 +325,7 @@ const onSearchKeyDown = (e) => {
 
   return (
     <div
-      className="min-h-screen relative transition-colors duration-300 overflow-hidden"
+      className="min-h-screen relative transition-colors duration-300 "
       style={{
         backgroundColor: theme.BG,
         color: theme.TEXT,
@@ -390,7 +399,7 @@ const onSearchKeyDown = (e) => {
           ))}
         </div>
 
-        <div className="max-w-6xl mx-auto w-full relative z-10">
+        <div className="max-w-6xl mx-auto w-full relative z-10 py-5">
           {/* Hero Text */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -438,7 +447,7 @@ const onSearchKeyDown = (e) => {
 <FiltersBar
   data={propertiesData}
   types={typesData}
-  showPriceRange={false}
+  showPriceRange={true}
   showApply={true}
   autoApply={false}
   showSearchButton={true}
@@ -478,7 +487,7 @@ const onSearchKeyDown = (e) => {
   </div>
 }
 
-onApply={({ q, locality, bedrooms, type, nearby }) => {
+onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
   const params = new URLSearchParams();
 
   const q2 = (q || "").trim();
@@ -486,12 +495,16 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
   const beds2 = (bedrooms || "").trim();
   const type2 = (type || "").trim();
   const near2 = (nearby || "").trim();
+  const min2 = (minPrice || "").trim();
+  const max2 = (maxPrice || "").trim();
 
   if (q2) params.set("q", q2);
   if (loc2 && loc2 !== "All") params.set("locality", loc2);
   if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
   if (type2 && type2 !== "Any") params.set("type", type2);
   if (near2 && near2 !== "Any") params.set("nearby", near2);
+  if (min2) params.set("minPrice", min2);
+    if (max2) params.set("maxPrice", max2);
 
   navigate(`/properties?${params.toString()}`);
 }}
@@ -515,7 +528,7 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
               ["40+", "Localities"],
               ["24/7", "Support"]
             ].map(([number, text]) => (
-              <div key={text} className="text-center">
+              <div key={text} className="text-center py-5">
                 <div className="text-lg font-bold" style={{ color: theme.GOLD }}>
                   {number}
                 </div>
@@ -529,8 +542,8 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
       </motion.section>
 
       {/* ================= HERO ================= */}
-      <motion.section className="relative overflow-hidden py-16" {...section}>
-        <div className="relative max-w-7xl mx-auto px-6">
+      <motion.section className="relative overflow-hidden py-20" {...section}>
+        <div className="relative max-w-7xl mx-auto px-6 ">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -680,7 +693,7 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
   <img
     src={`${API_BASE_URL}${site.hero_image}`}
     alt="Premium Hyderabad residence"
-    className="w-full h-[500px] object-cover"
+    className="w-full h-[470px] object-cover"
   />
 )}
 
@@ -953,7 +966,8 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
           />
         </div>
 
-        <div className="mt-5 flex gap-3 overflow-x-auto pb-2">
+       <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+
           {videos.map((v) => (
             <button
               key={v.id}
@@ -1170,7 +1184,7 @@ onApply={({ q, locality, bedrooms, type, nearby }) => {
                 className="group px-7 py-4 rounded-2xl font-bold text-base transition-transform hover:scale-105 shadow-2xl flex items-center gap-3 justify-center"
                 style={{ backgroundColor: theme.BG, color: theme.GOLD }}
               >
-                <span>View Portfolio</span>
+                <span>View Properties</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a

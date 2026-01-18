@@ -127,6 +127,8 @@ export default function Properties() {
     bedrooms: params.get("bedrooms")?.trim() || "Any",
     type: params.get("type")?.trim() || "Any",
     nearby: params.get("nearby")?.trim() || "Any",
+     minPrice: params.get("minPrice")?.trim() || "",
+    maxPrice: params.get("maxPrice")?.trim() || "",
   };
 
   setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -390,6 +392,8 @@ if (nearby && nearby !== "Any") {
   initialBedrooms={filters.bedrooms}
   initialType={filters.type}
   initialNearby={filters.nearby}
+    initialMinPrice={filters.minPrice}
+  initialMaxPrice={filters.maxPrice}
 />
 
           </div>
