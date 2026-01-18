@@ -693,7 +693,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
   <img
     src={`${API_BASE_URL}${site.hero_image}`}
     alt="Premium Hyderabad residence"
-    className="w-full h-[470px] object-cover"
+    className="w-full h-[450px] object-cover"
   />
 )}
 
@@ -735,7 +735,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
             </motion.div>
           </div>
 
-          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-4 max-w-3xl mt-16">
+          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-4 max-w-3xl mt-8">
             {[
               // ["250+", "Site Visits", "Curated Tours"],
               ["120+", "Happy Families", "Satisfied Clients"],
