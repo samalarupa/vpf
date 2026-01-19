@@ -367,7 +367,7 @@ const onSearchKeyDown = (e) => {
 
       {/* ================= HERO FILTER SECTION ================= */}
       <motion.section 
-        className="relative pt-20 pb-22 px-6 min-h-[80vh] flex mt-17 items-center justify-center"
+        className="relative pt-20 pb-27 px-6 min-h-[80vh] flex mt-12 items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
