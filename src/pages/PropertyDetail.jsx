@@ -290,12 +290,13 @@ const handleShare = async () => {
         {/* Header */}
         <motion.div
           {...section}
-          className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-10"
+          className="flex flex-col lg:flex-row lg:items-start lg:justify-between  mb-1"
         >
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="">
+            <div className="flex-1">
+            <div className="flex-col items-center  mb-4">
               <div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold"
+                className="inline-flex items-center gap-1 mr-2 px-4 py-2 rounded-full text-xs font-bold"
                 style={{
                   background: `linear-gradient(135deg, ${GOLD}E6 0%, ${GOLD_D}E6 100%)`,
                   color: BG,
@@ -306,7 +307,7 @@ const handleShare = async () => {
                 {property_type || "Premium"}
               </div>
               <div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold"
                 style={{
                   backgroundColor: `${GOLD}15`,
                   color: GOLD,
@@ -317,22 +318,30 @@ const handleShare = async () => {
                 Verified
               </div>
             </div>
+            </div>
 
             <h1
-              className="text-4xl md:text-5xl font-black tracking-tight mb-4"
+              className="text-4xl md:text-5xl font-black tracking-tight "
               style={{ color: TEXT }}
             >
               {title}
             </h1>
 
             <div
-              className="flex items-center gap-2 text-base"
+              className="flex items-center gap-1 text-base"
               style={{ color: MUTED }}
             >
               <MapPin size={18} style={{ color: GOLD }} />
               <span className="font-medium">
                 {locality}, {city || "Hyderabad"}
               </span>
+              <h2
+              className="text-3xl pr-50 pl-50 font-bold mb-6 flex items-center gap-3"
+              style={{ color: TEXT }}
+            >
+              <Youtube size={32} style={{ color: GOLD }} />
+              Property Video Tour
+            </h2>
             </div>
           </div>
 
@@ -367,61 +376,68 @@ const handleShare = async () => {
           </div>
         </motion.div>
 
-        {/* Gallery */}
-        {images.length > 0 && (
-          <motion.div
-            {...section}
-            className="relative rounded-[32px] overflow-hidden mb-12 group"
-            style={{
-              boxShadow: `0 40px 100px rgba(0,0,0,.6)`,
-              border: `2px solid ${GOLD}40`,
-            }}
-          >
-            <img
-              src={images[idx]}
-              alt={title}
-              className="w-full h-[500px] md:h-[600px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-            {/* Image counter */}
-            {images.length > 1 && (
-              <div
-                className="absolute bottom-6 right-6 px-4 py-2 rounded-xl backdrop-blur-xl text-sm font-semibold"
-                style={{
-                  backgroundColor: `${BG}E6`,
-                  border: `1px solid ${GOLD}40`,
-                }}
-              >
-                {idx + 1} / {images.length}
-              </div>
-            )}
-
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prev}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                  style={{
-                    backgroundColor: `${BG}CC`,
-                    border: `1px solid ${GOLD}60`,
-                  }}
-                >
-                  <ArrowLeft size={24} color={GOLD} />
-                </button>
-                <button
-                  onClick={next}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                  style={{
-                    backgroundColor: `${BG}CC`,
-                    border: `1px solid ${GOLD}60`,
-                  }}
-                >
-                  <ArrowRight size={24} color={GOLD} />
-                </button>
-              </>
-            )}
-          </motion.div>
+        
+        {/* Video Section */}
+        {embedUrl && (
+          <motion.section {...section} className="mt-1 mb-8">
+            {/* <h2
+              className="text-3xl font-bold mb-6 flex items-center gap-3"
+              style={{ color: TEXT }}
+            >
+              <Youtube size={32} style={{ color: GOLD }} />
+              Property Video Tour
+            </h2> */}
+            <div
+              className="rounded-[32px] overflow-hidden cursor-pointer relative group"
+              style={{
+                border: `2px solid ${GOLD}40`,
+                boxShadow: "0 30px 80px rgba(0,0,0,.5)",
+              }}
+              onClick={() => setShowVideo(true)}
+            >
+              {!showVideo ? (
+                <>
+                  <img
+                    src={image}
+                    alt="video preview"
+                    className="w-full h-[600px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm group-hover:bg-black/70 transition-all">
+                    <div
+                      className="h-20 w-20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                      style={{
+                        background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`,
+                        boxShadow: `0 8px 32px ${GOLD}50`,
+                      }}
+                    >
+                      <Youtube size={40} color={BG} />
+                    </div>
+                    <p
+                      className="text-xl font-bold"
+                      style={{ color: TEXT }}
+                    >
+                      Watch Full Video Tour
+                    </p>
+                    <p
+                      className="text-sm mt-2"
+                      style={{ color: MUTED }}
+                    >
+                      Click to play
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <iframe
+                  title="Property Video"
+                  className="w-full aspect-video"
+                  src={`${embedUrl}?autoplay=1&mute=0&loop=1&rel=0&modestbranding=1`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
+            </div>
+          </motion.section>
         )}
 
         {/* Main Content Grid */}
@@ -686,66 +702,62 @@ const handleShare = async () => {
           </motion.aside>
         </div>
 
-        {/* Video Section */}
-        {embedUrl && (
-          <motion.section {...section} className="mt-12">
-            <h2
-              className="text-3xl font-bold mb-6 flex items-center gap-3"
-              style={{ color: TEXT }}
-            >
-              <Youtube size={32} style={{ color: GOLD }} />
-              Property Video Tour
-            </h2>
-            <div
-              className="rounded-[32px] overflow-hidden cursor-pointer relative group"
-              style={{
-                border: `2px solid ${GOLD}40`,
-                boxShadow: "0 30px 80px rgba(0,0,0,.5)",
-              }}
-              onClick={() => setShowVideo(true)}
-            >
-              {!showVideo ? (
-                <>
-                  <img
-                    src={image}
-                    alt="video preview"
-                    className="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm group-hover:bg-black/70 transition-all">
-                    <div
-                      className="h-20 w-20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                      style={{
-                        background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`,
-                        boxShadow: `0 8px 32px ${GOLD}50`,
-                      }}
-                    >
-                      <Youtube size={40} color={BG} />
-                    </div>
-                    <p
-                      className="text-xl font-bold"
-                      style={{ color: TEXT }}
-                    >
-                      Watch Full Video Tour
-                    </p>
-                    <p
-                      className="text-sm mt-2"
-                      style={{ color: MUTED }}
-                    >
-                      Click to play
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <iframe
-                  title="Property Video"
-                  className="w-full aspect-video"
-                  src={`${embedUrl}?autoplay=1&mute=0&loop=1&rel=0&modestbranding=1`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              )}
-            </div>
-          </motion.section>
+      
+        {/* Gallery */}
+        {images.length > 0 && (
+          <motion.div
+            {...section}
+            className="relative rounded-[32px] overflow-hidden mb-10 mt-8 group"
+            style={{
+              boxShadow: `0 40px 100px rgba(0,0,0,.6)`,
+              border: `2px solid ${GOLD}40`,
+            }}
+          >
+            <img
+              src={images[idx]}
+              alt={title}
+              className="w-full h-[500px] md:h-[600px] object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+            {/* Image counter */}
+            {images.length > 1 && (
+              <div
+                className="absolute bottom-6 right-6 px-4 py-2 rounded-xl backdrop-blur-xl text-sm font-semibold"
+                style={{
+                  backgroundColor: `${BG}E6`,
+                  border: `1px solid ${GOLD}40`,
+                }}
+              >
+                {idx + 1} / {images.length}
+              </div>
+            )}
+
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prev}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                  style={{
+                    backgroundColor: `${BG}CC`,
+                    border: `1px solid ${GOLD}60`,
+                  }}
+                >
+                  <ArrowLeft size={24} color={GOLD} />
+                </button>
+                <button
+                  onClick={next}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                  style={{
+                    backgroundColor: `${BG}CC`,
+                    border: `1px solid ${GOLD}60`,
+                  }}
+                >
+                  <ArrowRight size={24} color={GOLD} />
+                </button>
+              </>
+            )}
+          </motion.div>
         )}
       </div>
       <ShareModal
