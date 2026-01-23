@@ -79,7 +79,8 @@ const HYDERABAD_LOCALITIES = [
   "Miyapur", "Kukatpally", "Ameerpet", "Secunderabad", "Begumpet"
 ];
 
-const POPULAR_LOCALITIES = ["Gachibowli", "Madhapur", "Kukatpally", "Kondapur", "Miyapur"];
+
+
 /* -----------------------------
    UTIL - extract YouTube ID from many possible formats
 ------------------------------ */
@@ -113,9 +114,12 @@ function extractYouTubeId(url) {
    PAGE
 ------------------------------ */
 export default function Home() {
+// const settings = useContext(SiteSettingsContext);
   
 const site = useContext(SiteSettingsContext);
-
+const popularLocalities = Array.isArray(site?.popular_localities)
+  ? site.popular_localities
+  : [];
   
 
   const navigate = useNavigate();
@@ -463,7 +467,7 @@ const onSearchKeyDown = (e) => {
 
     {/* Chips */}
     <div className="flex flex-wrap items-center gap-3 mb-3">
-      {POPULAR_LOCALITIES.map((loc) => (
+      {popularLocalities.map((loc)=> (
         <button
           key={loc}
           type="button"
