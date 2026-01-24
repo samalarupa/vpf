@@ -1,138 +1,169 @@
-import { MapPin, Bed, Home, ArrowRight } from "lucide-react";
+import { MapPin, Bed, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-/* Matching the homepage color palette */
+/* Theme */
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
 const ACCENT = "#1A2347";
 const TEXT = "#F8F9FB";
 const MUTED = "#B8BDD0";
 const GOLD = "#D4AF37";
-const GOLD_L = "#E8C875";
-const GOLD_D = "#B8963A";
 const LINE = "#1F2847";
 
 export default function PropertyCard({ item }) {
-  const [isSaved, setIsSaved] = useState(false);
+  const images =
+    item.images && item.images.length > 0
+      ? item.images
+      : item.image
+      ? [item.image]
+      : [];
+
+  const [index, setIndex] = useState(0);
+
+  const next = (e) => {
+    e.stopPropagation();
+    setIndex((i) => (i + 1) % images.length);
+  };
+
+  const prev = (e) => {
+    e.stopPropagation();
+    setIndex((i) => (i - 1 + images.length) % images.length);
+  };
 
   return (
-    <article 
-      className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
-      style={{ 
+    <article
+      className="group relative overflow-hidden rounded-3xl cursor-pointer transition-all hover:-translate-y-2"
+      style={{
         background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
         border: `1px solid ${LINE}`,
-        boxShadow: "0 20px 60px rgba(0,0,0,.4)"
+        boxShadow: "0 20px 60px rgba(0,0,0,.4)",
       }}
     >
-      {/* Property Type Badge */}
-      <div 
-        className="absolute left-5 top-5 z-10 px-4 py-2 text-xs font-bold rounded-full backdrop-blur-md"
-        style={{ 
-          background: `linear-gradient(135deg, ${GOLD}E6 0%, ${GOLD_D}E6 100%)`,
-          color: BG,
-          boxShadow: `0 4px 12px ${GOLD}40`
-        }}
-      >
-        {item.property_type || "Premium"}
-      </div>
-
-      {/* Save Button */}
-      {/* <button 
-        onClick={() => setIsSaved(!isSaved)}
-        className="absolute right-5 top-5 z-10 p-2.5 rounded-full backdrop-blur-md hover:scale-110 transition-transform" 
-        style={{ backgroundColor: `${BG}B3` }}
-        aria-label="Save property"
-      >
-        <Heart 
-          className="h-5 w-5" 
-          color={GOLD} 
-          fill={isSaved ? GOLD : "none"}
-        />
-      </button> */}
-
-      {/* Image Container */}
+      {/* ---------- IMAGE CAROUSEL ---------- */}
       <div className="relative overflow-hidden">
-        <img 
-          src={item.image}
-          alt={item.title}
-          loading="lazy"
-          className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ background: `linear-gradient(180deg, transparent 0%, ${BG}CC 100%)` }} 
-        />
+        {images.length > 0 && (
+          <>
+            <img
+              src={images[index]}
+              alt={item.title}
+              className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+
+            {/* Overlay gradient */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, transparent 50%, ${BG}CC 100%)`,
+              }}
+            />
+
+            {/* Arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prev}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  style={{
+                    backgroundColor: `${BG}CC`,
+                    border: `1px solid ${GOLD}40`,
+                  }}
+                >
+                  <ArrowLeft size={20} color={GOLD} />
+                </button>
+
+                <button
+                  onClick={next}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  style={{
+                    backgroundColor: `${BG}CC`,
+                    border: `1px solid ${GOLD}40`,
+                  }}
+                >
+                  <ArrowRight size={20} color={GOLD} />
+                </button>
+              </>
+            )}
+          </>
+        )}
       </div>
 
-      {/* Content */}
+      {/* ---------- THUMBNAILS ---------- */}
+      {images.length > 1 && (
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto">
+          {images.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIndex(i);
+              }}
+              className="h-14 w-20 object-cover rounded-lg cursor-pointer border transition-all"
+              style={{
+                border:
+                  i === index
+                    ? `2px solid ${GOLD}`
+                    : `1px solid ${LINE}`,
+                opacity: i === index ? 1 : 0.6,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ---------- CONTENT ---------- */}
       <div className="p-6">
-        <h3 
-          className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-gold-light transition-colors"
+        <h3
+          className="text-xl font-bold mb-2 line-clamp-2"
           style={{ color: TEXT }}
         >
           {item.title}
         </h3>
 
-        {/* Property Details */}
-        <div className="flex flex-wrap items-center gap-3 mb-4 text-sm" style={{ color: MUTED }}>
-          <div className="flex items-center gap-1.5">
-            <MapPin size={16} style={{ color: GOLD }} />
-            <span>{item.locality}</span>
-          </div>
+        <div
+          className="flex items-center gap-3 text-sm mb-3"
+          style={{ color: MUTED }}
+        >
+          <MapPin size={16} color={GOLD} />
+          <span>{item.locality}</span>
+
           {item.bedrooms && (
             <>
               <span style={{ color: LINE }}>•</span>
-              <div className="flex items-center gap-1.5">
-                <Bed size={16} style={{ color: GOLD }} />
-                <span>{item.bedrooms} BHK</span>
-              </div>
+              <Bed size={16} color={GOLD} />
+              <span>{item.bedrooms} BHK</span>
             </>
           )}
         </div>
 
-        {/* Price and CTA */}
-        <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: LINE }}>
+        <div
+          className="pt-4 border-t flex items-center justify-between"
+          style={{ borderColor: LINE }}
+        >
           <div>
-            <div className="text-xs mb-1" style={{ color: MUTED }}>
+            <div className="text-xs" style={{ color: MUTED }}>
               Starting from
             </div>
-            <div 
+            <div
               className="text-3xl font-black"
-              style={{ 
-                background: `linear-gradient(135deg, ${GOLD_L} 0%, ${GOLD} 100%)`,
+              style={{
+                background: `linear-gradient(135deg, ${GOLD} 0%, #E8C875 100%)`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
               }}
             >
               ₹{item.priceLakh}L
             </div>
           </div>
-          
-          <button
-            className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all hover:scale-105 flex items-center gap-2 group/btn"
-            style={{
-              background: `linear-gradient(135deg, ${GOLD}20 0%, ${GOLD}10 100%)`,
-              border: `1px solid ${GOLD}40`,
-              color: GOLD
-            }}
+
+          <span
+            className="text-sm font-semibold"
+            style={{ color: GOLD }}
           >
-            <span>View</span>
-            <ArrowRight 
-              size={16} 
-              className="group-hover/btn:translate-x-1 transition-transform" 
-            />
-          </button>
+            View →
+          </span>
         </div>
       </div>
-
-      {/* Hover glow effect */}
-      <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
-        style={{ 
-          boxShadow: `inset 0 0 80px ${GOLD}10`,
-        }}
-      />
     </article>
   );
 }

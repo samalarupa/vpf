@@ -26,11 +26,16 @@ import {
   MessageCircle,
   Linkedin,
 } from "lucide-react";
+// Build images array for gallery + carousel
+
+
 
 import { API_BASE_URL } from "../config";
 import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 import ReviewForm from "../components/ReviewForm";
+import ImageCarousel from "../components/ImageCarousel";
+
 
 
 /* Matching the homepage color palette */
@@ -76,6 +81,7 @@ export default function PropertyDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [property, setProperty] = useState(null);
+  
   const [showVideo, setShowVideo] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -208,6 +214,7 @@ const handleShare = async () => {
       </div>
     );
   }
+  
 
   // now we are sure property exists
   const {
@@ -223,6 +230,31 @@ const handleShare = async () => {
     plotSize,
     videoUrl,
   } = property;
+  // ✅ Build image list for carousel + gallery
+let images = [];
+
+// Priority 1: gallery_images from backend
+if (property.gallery_images) {
+  if (Array.isArray(property.gallery_images)) {
+    images = property.gallery_images;
+  } else {
+    try {
+      images = JSON.parse(property.gallery_images);
+    } catch {
+      images = [];
+    }
+  }
+}
+
+// Priority 2: fallback to single image
+if (images.length === 0) {
+  if (property.image_url) images = [property.image_url];
+  else if (property.image) images = [property.image];
+}
+
+// safety: remove empty values
+images = images.filter(Boolean);
+
 
   const nearbyList = (property.nearby || "")
   .split(",")
@@ -230,7 +262,8 @@ const handleShare = async () => {
   .filter(Boolean);
 
 
-  const images = property.images || (image ? [image] : []);
+  // const images = property.images || (image ? [image] : []);
+
   const next = () => setIdx((i) => (i + 1) % images.length);
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
 
@@ -704,61 +737,15 @@ const handleShare = async () => {
 
       
         {/* Gallery */}
-        {images.length > 0 && (
-          <motion.div
-            {...section}
-            className="relative rounded-[32px] overflow-hidden mb-10 mt-8 group"
-            style={{
-              boxShadow: `0 40px 100px rgba(0,0,0,.6)`,
-              border: `2px solid ${GOLD}40`,
-            }}
-          >
-            <img
-              src={images[idx]}
-              alt={title}
-              className="w-full h-[500px] md:h-[600px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Image Gallery Carousel */}
+{/* Gallery */}
+{images.length > 0 && (
+  <motion.section {...section} className="mt-10">
+    <ImageCarousel images={images} />
+  </motion.section>
+)}
 
-            {/* Image counter */}
-            {images.length > 1 && (
-              <div
-                className="absolute bottom-6 right-6 px-4 py-2 rounded-xl backdrop-blur-xl text-sm font-semibold"
-                style={{
-                  backgroundColor: `${BG}E6`,
-                  border: `1px solid ${GOLD}40`,
-                }}
-              >
-                {idx + 1} / {images.length}
-              </div>
-            )}
 
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prev}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                  style={{
-                    backgroundColor: `${BG}CC`,
-                    border: `1px solid ${GOLD}60`,
-                  }}
-                >
-                  <ArrowLeft size={24} color={GOLD} />
-                </button>
-                <button
-                  onClick={next}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 h-14 w-14 rounded-2xl flex items-center justify-center backdrop-blur-xl hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                  style={{
-                    backgroundColor: `${BG}CC`,
-                    border: `1px solid ${GOLD}60`,
-                  }}
-                >
-                  <ArrowRight size={24} color={GOLD} />
-                </button>
-              </>
-            )}
-          </motion.div>
-        )}
       </div>
       <ShareModal
   open={shareOpen}
