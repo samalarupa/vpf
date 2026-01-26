@@ -294,7 +294,7 @@ const handleShare = async () => {
         >
           <div className="">
             <div className="flex-1">
-            <div className="flex-col items-center  mb-4">
+            <div className="flex-col items-center mb-1">
               <div
                 className="inline-flex items-center gap-1 mr-2 px-4 py-2 rounded-full text-xs font-bold"
                 style={{
