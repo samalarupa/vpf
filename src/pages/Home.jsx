@@ -26,6 +26,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { API_BASE_URL } from "../config";
 import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
+import LocationSection from "../components/LocationSection";
 
 
 /* -----------------------------
@@ -1203,6 +1204,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
           </div>
         </div>
       </motion.section>
+      <LocationSection />
 
       <div className="h-px max-w-7xl mx-auto" style={{ background: `linear-gradient(90deg, transparent, ${theme.GOLD}40, transparent)` }} />
     </div>
