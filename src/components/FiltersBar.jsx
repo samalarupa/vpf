@@ -25,7 +25,7 @@ export default function FiltersBar({
 initialMaxPrice = "",
 
   // controls
-  showPriceRange = true, // homepage: false
+  showPriceRange = false, // homepage: false
   showSearch = true,
   showApply = false, // homepage: true
   autoApply = true, // properties page: true, homepage: false
@@ -325,7 +325,7 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
         </div>
 
         {/* Bedrooms */}
-        <div className="col-span-1">
+        <div className="col-span-2">
           <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
             Bedrooms
           </label>
@@ -353,7 +353,7 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
 
         {/* Search */}
         {showSearch && (
-          <div className= "col-span-3">
+          <div className= "col-span-4">
   <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
     Search
   </label>
@@ -369,7 +369,7 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search by title or locality..."
+        placeholder="Search by locality or price"
         className={`w-full pl-9 pr-4 py-3 outline-gray-800 outline-1 outline-r-none rounded-l-xl rounded-r-none text-sm font-medium  focus:ring-2 ${placeholderClass}`}
         style={inputStyle}
       />

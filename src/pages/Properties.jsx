@@ -222,15 +222,28 @@ if (nearby && nearby !== "Any") {
 
 
 
-    if (q) {
-      const query = q.toLowerCase();
-      list = list.filter(
-        (p) =>
-          (p.title || "").toLowerCase().includes(query) ||
-          (p.locality || "").toLowerCase().includes(query) ||
-          (p.nearby_locations || "").toLowerCase().includes(query)
-      );
-    }
+if (q) {
+  const query = q.toLowerCase();
+
+  const priceFromSearch = parsePriceFromQuery(query);
+
+  // ✅ IF PRICE QUERY → APPLY ONLY PRICE FILTER
+  if (priceFromSearch !== null) {
+    list = list.filter((p) => p.priceLakh <= priceFromSearch);
+  } 
+  // ✅ ELSE → APPLY ONLY TEXT SEARCH
+  else {
+    list = list.filter(
+      (p) =>
+        (p.title || "").toLowerCase().includes(query) ||
+        (p.locality || "").toLowerCase().includes(query) ||
+        (p.nearby_locations || "").toLowerCase().includes(query)
+    );
+  }
+}
+    
+
+  
 
     if (sortBy === "priceAsc") {
       list.sort((a, b) => (a.priceLakh || 0) - (b.priceLakh || 0));
@@ -457,4 +470,21 @@ if (nearby && nearby !== "Any") {
       </section>
     </div>
   );
+}
+function parsePriceFromQuery(q) {
+  const match = q.match(/(\d+(?:\.\d+)?)\s*(l|lakh|lakhs|cr|crore|crores)?/i);
+  if (!match) return null;
+
+  let value = parseFloat(match[1]);
+  let unit = match[2]?.toLowerCase();
+
+  if (!unit || unit.startsWith("l")) {
+    return value; // already in lakhs
+  }
+
+  if (unit.startsWith("cr")) {
+    return value * 100; // convert crore → lakh
+  }
+
+  return null;
 }

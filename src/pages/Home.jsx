@@ -452,7 +452,7 @@ const onSearchKeyDown = (e) => {
 <FiltersBar
   data={propertiesData}
   types={typesData}
-  showPriceRange={true}
+  showPriceRange={false}
   showApply={true}
   autoApply={false}
   showSearchButton={true}
