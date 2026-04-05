@@ -300,7 +300,7 @@ if (q) {
       </div>
 
       {/* Breadcrumbs */}
-      <div className="relative max-w-7xl mx-auto px-6 pt-24 pb-4">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4">
         <nav className="flex items-center gap-2 text-sm">
           <Link
             to="/"
@@ -325,8 +325,8 @@ if (q) {
         className="relative border-b pt-4 pb-12"
         style={{ borderColor: LINE }}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
             <div className="space-y-4">
               <div
                 className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-medium"
@@ -342,7 +342,7 @@ if (q) {
               </div>
 
               <h1
-                className="text-4xl md:text-5xl font-black"
+                className="text-3xl sm:text-4xl md:text-5xl font-black"
                 style={{ color: TEXT }}
               >
                 Discover Your{" "}
@@ -358,14 +358,14 @@ if (q) {
                 </span>
               </h1>
 
-              <p className="text-lg" style={{ color: MUTED }}>
+              <p className="text-base sm:text-lg" style={{ color: MUTED }}>
                 Browse our verified homes and premium properties across
                 Hyderabad.
               </p>
             </div>
 
             {/* Sort */}
-            <div className="flex items-center gap-3 ml-auto">
+            <div className="flex items-center gap-3 sm:ml-auto">
               <SlidersHorizontal size={18} style={{ color: GOLD }} />
               <label
                 className="text-sm font-medium"
@@ -395,7 +395,7 @@ if (q) {
           </div>
 
           {/* Filters */}
-          <div className="mt-10">
+          <div className="mt-6 sm:mt-10">
           <FiltersBar
   data={properties}
   onChange={setFilters}
@@ -430,10 +430,10 @@ if (q) {
       </section>
 
       {/* Property Cards */}
-      <section className="relative max-w-7xl mx-auto px-6 py-16">
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {filtered.length === 0 ? (
           <div
-            className="text-center py-20 rounded-3xl backdrop-blur-sm"
+            className="text-center py-12 sm:py-20 rounded-3xl backdrop-blur-sm"
             style={{
               background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
               border: `1px solid ${LINE}`,
@@ -456,7 +456,8 @@ if (q) {
             </p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8"
+>
             {filtered.map((p) => (
               <div
                 key={p.id}

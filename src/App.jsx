@@ -8,6 +8,7 @@ import PropertyDetail from "./pages/PropertyDetail.jsx";
 import { SiteSettingsContext } from "./context/SiteSettingsContext.jsx";
 import { API_BASE_URL } from "./config";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import ListProperty from "./pages/ListProperty";
 
 export default function App() {
   const [settings, setSettings] = useState(null);
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/properties" element={<Properties />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/list-property" element={<ListProperty />} />
           </Routes>
         </main>
         <Footer />

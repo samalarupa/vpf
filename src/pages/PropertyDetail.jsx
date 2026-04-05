@@ -301,12 +301,12 @@ images = images.filter(Boolean);
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 pt-28 pb-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-20">
         {/* Breadcrumb */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-sm mb-8"
+          className="flex items-center gap-2 text-sm mb-4 sm:mb-8"
         >
           <Link
             to="/properties"
@@ -323,7 +323,7 @@ images = images.filter(Boolean);
         {/* Header */}
         <motion.div
           {...section}
-          className="flex flex-col lg:flex-row lg:items-start lg:justify-between  mb-1"
+          className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-1"
         >
           <div className="">
             <div className="flex-1">
@@ -354,7 +354,7 @@ images = images.filter(Boolean);
             </div>
 
             <h1
-              className="text-4xl md:text-5xl font-black tracking-tight "
+             className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight"
               style={{ color: TEXT }}
             >
               {title}
@@ -368,13 +368,7 @@ images = images.filter(Boolean);
               <span className="font-medium">
                 {locality}, {city || "Hyderabad"}
               </span>
-              <h2
-              className="text-3xl pr-50 pl-50 font-bold mb-6 flex items-center gap-3"
-              style={{ color: TEXT }}
-            >
-              <Youtube size={32} style={{ color: GOLD }} />
-              Property Video Tour
-            </h2>
+            
             </div>
           </div>
 
@@ -434,7 +428,7 @@ images = images.filter(Boolean);
                   <img
                     src={image}
                     alt="video preview"
-                    className="w-full h-[600px] object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-[220px] sm:h-[380px] md:h-[500px] lg:h-[600px] object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm group-hover:bg-black/70 transition-all">
                     <div
@@ -474,12 +468,12 @@ images = images.filter(Boolean);
         )}
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left Column - Details */}
           <motion.div {...section} className="lg:col-span-2 space-y-8">
             {/* Key Features */}
             <div
-              className="rounded-3xl p-8 backdrop-blur-sm"
+              className="rounded-3xl p-5 sm:p-8 backdrop-blur-sm"
               style={{
                 background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
                 border: `1px solid ${LINE}`,
@@ -540,7 +534,7 @@ images = images.filter(Boolean);
 
             {nearbyList.length > 0 && (
   <div
-    className="rounded-3xl p-8 backdrop-blur-sm"
+    className="rounded-3xl p-5 sm:p-8 backdrop-blur-sm"
     style={{
       background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
       border: `1px solid ${LINE}`,
@@ -550,7 +544,7 @@ images = images.filter(Boolean);
       Nearby Locations
     </h2>
 
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
       {nearbyList.map((place, i) => (
         <div
           key={i}
@@ -581,7 +575,7 @@ images = images.filter(Boolean);
 
             {/* Description */}
             <div
-              className="rounded-3xl p-8 backdrop-blur-sm"
+              className="rounded-3xl p-5 sm:p-8 backdrop-blur-sm"
               style={{
                 background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
                 border: `1px solid ${LINE}`,
@@ -640,7 +634,7 @@ images = images.filter(Boolean);
           <motion.aside {...section} className="space-y-6">
             {/* Price Card */}
             <div
-              className="rounded-3xl p-8 backdrop-blur-sm sticky top-24"
+             className="rounded-3xl p-5 sm:p-8 backdrop-blur-sm sm:sticky sm:top-24"
               style={{
                 background: `linear-gradient(135deg, ${ACCENT} 0%, ${SURFACE} 100%)`,
                 border: `1px solid ${LINE}`,
@@ -655,7 +649,7 @@ images = images.filter(Boolean);
                   Starting From
                 </div>
                 <div
-                  className="text-5xl font-black mb-2"
+                 className="text-4xl sm:text-5xl font-black mb-2"
                   style={{
                     background: `linear-gradient(135deg, ${GOLD_L} 0%, ${GOLD} 50%, ${GOLD_D} 100%)`,
                     WebkitBackgroundClip: "text",

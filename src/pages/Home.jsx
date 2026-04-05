@@ -64,8 +64,8 @@ const fmtLakh = (n) => `₹ ${Number(n).toLocaleString("en-IN")} L`;
 ------------------------------ */
 const FEATURED = [
   { id: 1, title: "Modern Villa in Banjara Hills", priceLakh: 185, locality: "Banjara Hills", image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&q=80", tag: "Exclusive" },
-  { id: 2, title: "3BHK Apartment • Gachibowli",   priceLakh: 95,  locality: "Gachibowli",    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&q=80", tag: "Premium" },
-  { id: 3, title: "Premium Plot in Kokapet",        priceLakh: 125, locality: "Kokapet",       image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80", tag: "New" },
+  { id: 2, title: "3BHK Apartment • Gachibowli", priceLakh: 95, locality: "Gachibowli", image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&q=80", tag: "Premium" },
+  { id: 3, title: "Premium Plot in Kokapet", priceLakh: 125, locality: "Kokapet", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80", tag: "New" },
 ];
 
 const TESTIMONIALS = [
@@ -75,7 +75,7 @@ const TESTIMONIALS = [
 ];
 
 const HYDERABAD_LOCALITIES = [
-  "Gachibowli", "Banjara Hills", "Jubilee Hills", "Kondapur", "Madhapur", 
+  "Gachibowli", "Banjara Hills", "Jubilee Hills", "Kondapur", "Madhapur",
   "HITEC City", "Financial District", "Kokapet", "Nanakramguda", "Manikonda",
   "Miyapur", "Kukatpally", "Ameerpet", "Secunderabad", "Begumpet"
 ];
@@ -115,13 +115,13 @@ function extractYouTubeId(url) {
    PAGE
 ------------------------------ */
 export default function Home() {
-// const settings = useContext(SiteSettingsContext);
-  
-const site = useContext(SiteSettingsContext);
-const popularLocalities = Array.isArray(site?.popular_localities)
-  ? site.popular_localities
-  : [];
-  
+  // const settings = useContext(SiteSettingsContext);
+
+  const site = useContext(SiteSettingsContext);
+  const popularLocalities = Array.isArray(site?.popular_localities)
+    ? site.popular_localities
+    : [];
+
 
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
@@ -140,44 +140,44 @@ const popularLocalities = Array.isArray(site?.popular_localities)
   const [reviews, setReviews] = useState([]);
   const [activeVideoId, setActiveVideoId] = useState(null);
   const [propertiesData, setPropertiesData] = useState([]);
-const [typesData, setTypesData] = useState([]);
-
-useEffect(() => {
-  async function loadFilterData() {
-    try {
-      const [propsRes, typesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/properties/list.php`),
-        fetch(`${API_BASE_URL}/property_types/list.php`),
-      ]);
-
-      const propsJson = propsRes.ok ? await propsRes.json() : [];
-      const typesJson = typesRes.ok ? await typesRes.json() : [];
-
-      setPropertiesData(Array.isArray(propsJson) ? propsJson : []);
-      setTypesData(
-        Array.isArray(typesJson)
-          ? typesJson.map((t) => (t.name || "").trim()).filter(Boolean)
-          : []
-      );
-    } catch (e) {
-      console.error("Failed to load filter data:", e);
-      setPropertiesData([]);
-      setTypesData([]);
-    }
-  }
-
-  loadFilterData();
-}, []);
+  const [typesData, setTypesData] = useState([]);
 
   useEffect(() => {
-  document.documentElement.classList.add("hide-scrollbar");
-  document.body.classList.add("hide-scrollbar");
+    async function loadFilterData() {
+      try {
+        const [propsRes, typesRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/properties/list.php`),
+          fetch(`${API_BASE_URL}/property_types/list.php`),
+        ]);
 
-  return () => {
-    document.documentElement.classList.remove("hide-scrollbar");
-    document.body.classList.remove("hide-scrollbar");
-  };
-}, []);
+        const propsJson = propsRes.ok ? await propsRes.json() : [];
+        const typesJson = typesRes.ok ? await typesRes.json() : [];
+
+        setPropertiesData(Array.isArray(propsJson) ? propsJson : []);
+        setTypesData(
+          Array.isArray(typesJson)
+            ? typesJson.map((t) => (t.name || "").trim()).filter(Boolean)
+            : []
+        );
+      } catch (e) {
+        console.error("Failed to load filter data:", e);
+        setPropertiesData([]);
+        setTypesData([]);
+      }
+    }
+
+    loadFilterData();
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.add("hide-scrollbar");
+    document.body.classList.add("hide-scrollbar");
+
+    return () => {
+      document.documentElement.classList.remove("hide-scrollbar");
+      document.body.classList.remove("hide-scrollbar");
+    };
+  }, []);
 
 
   useEffect(() => {
@@ -254,7 +254,7 @@ useEffect(() => {
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-  }; 
+  };
 
   const section = {
     initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
@@ -270,7 +270,7 @@ useEffect(() => {
 
   const item = {
     hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16, scale: prefersReducedMotion ? 1 : 0.96 },
-    show:   { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
+    show: { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
   };
   // function goToPropertiesWithLocality(locality) {
   //   if (!locality) {
@@ -301,30 +301,30 @@ useEffect(() => {
   //   }
   // };
   function goToPropertiesWithLocality(locality) {
-  if (!locality) {
-    navigate("/properties");
-    return;
+    if (!locality) {
+      navigate("/properties");
+      return;
+    }
+
+    // Always send as q=<text> so that Properties page search bar updates
+    const q = new URLSearchParams({ q: locality.trim() }).toString();
+    navigate(`/properties?${q}`);
   }
 
-  // Always send as q=<text> so that Properties page search bar updates
-  const q = new URLSearchParams({ q: locality.trim() }).toString();
-  navigate(`/properties?${q}`);
-}
+  const onSearchClick = () => {
+    if (!searchQuery || !searchQuery.trim()) {
+      navigate("/properties");
+      return;
+    }
+    goToPropertiesWithLocality(searchQuery);
+  };
 
-const onSearchClick = () => {
-  if (!searchQuery || !searchQuery.trim()) {
-    navigate("/properties");
-    return;
-  }
-  goToPropertiesWithLocality(searchQuery);
-};
-
-const onSearchKeyDown = (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    onSearchClick();
-  }
-};
+  const onSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSearchClick();
+    }
+  };
 
 
 
@@ -334,7 +334,7 @@ const onSearchKeyDown = (e) => {
       style={{
         backgroundColor: theme.BG,
         color: theme.TEXT,
-        backgroundImage: isDarkMode 
+        backgroundImage: isDarkMode
           ? `radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 50%),
              radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.06), transparent 45%),
              linear-gradient(180deg, ${theme.BG} 0%, #0D1230 100%)`
@@ -343,7 +343,7 @@ const onSearchKeyDown = (e) => {
              linear-gradient(180deg, ${theme.BG} 0%, #F0F2F5 100%)`,
       }}
     >
-      
+
       {/* Scroll to Top */}
       <motion.button
         onClick={scrollToTop}
@@ -371,7 +371,7 @@ const onSearchKeyDown = (e) => {
       )}
 
       {/* ================= HERO FILTER SECTION ================= */}
-      <motion.section 
+      <motion.section
         className="relative pt-20 pb-27 px-6 min-h-[80vh] flex mt-12 items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -449,71 +449,71 @@ const onSearchKeyDown = (e) => {
           {/* Filter Bar */}
 
 
-<FiltersBar
-  data={propertiesData}
-  types={typesData}
-  showPriceRange={false}
-  showApply={true}
-  autoApply={false}
-  showSearchButton={true}
-  leftOfApply={
-  <div className="flex flex-col gap-2 pt-1">
-    {/* Label */}
-    <span
-      className="text-[11px] font-semibold tracking-wide uppercase"
-      style={{ color: theme.MUTED }}
-    >
-      Popular areas
-    </span>
+          <FiltersBar
+            data={propertiesData}
+            types={typesData}
+            showPriceRange={false}
+            showApply={true}
+            autoApply={false}
+            showSearchButton={true}
+            leftOfApply={
+              <div className="flex flex-col gap-2 pt-1">
+                {/* Label */}
+                <span
+                  className="text-[11px] font-semibold tracking-wide uppercase"
+                  style={{ color: theme.MUTED }}
+                >
+                  Popular areas
+                </span>
 
-    {/* Chips */}
-    <div className="flex flex-wrap items-center gap-3 mb-3">
-      {popularLocalities.map((loc)=> (
-        <button
-          key={loc}
-          type="button"
-          onClick={() =>
-            navigate(
-              `/properties?${new URLSearchParams({ q: loc }).toString()}`
-            )
-          }
-          className="px-3 py-1.5 rounded-full text-xs font-medium transition-all
+                {/* Chips */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+                  {popularLocalities.map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/properties?${new URLSearchParams({ q: loc }).toString()}`
+                        )
+                      }
+                      className="px-3 py-1.5 rounded-full text-xs font-medium transition-all
                      hover:scale-105 hover:shadow-md"
-          style={{
-            background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-            border: `1px solid ${theme.GOLD}30`,
-            color: theme.TEXT,
-          }}
-        >
-          {loc}
-        </button>
-      ))}
-    </div>
-  </div>
-}
+                      style={{
+                        background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+                        border: `1px solid ${theme.GOLD}30`,
+                        color: theme.TEXT,
+                      }}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            }
 
-onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
-  const params = new URLSearchParams();
+            onApply={({ q, locality, bedrooms, type, nearby, minPrice, maxPrice }) => {
+              const params = new URLSearchParams();
 
-  const q2 = (q || "").trim();
-  const loc2 = (locality || "").trim();
-  const beds2 = (bedrooms || "").trim();
-  const type2 = (type || "").trim();
-  const near2 = (nearby || "").trim();
-  const min2 = (minPrice || "").trim();
-  const max2 = (maxPrice || "").trim();
+              const q2 = (q || "").trim();
+              const loc2 = (locality || "").trim();
+              const beds2 = (bedrooms || "").trim();
+              const type2 = (type || "").trim();
+              const near2 = (nearby || "").trim();
+              const min2 = (minPrice || "").trim();
+              const max2 = (maxPrice || "").trim();
 
-  if (q2) params.set("q", q2);
-  if (loc2 && loc2 !== "All") params.set("locality", loc2);
-  if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
-  if (type2 && type2 !== "Any") params.set("type", type2);
-  if (near2 && near2 !== "Any") params.set("nearby", near2);
-  if (min2) params.set("minPrice", min2);
-    if (max2) params.set("maxPrice", max2);
+              if (q2) params.set("q", q2);
+              if (loc2 && loc2 !== "All") params.set("locality", loc2);
+              if (beds2 && beds2 !== "Any") params.set("bedrooms", beds2);
+              if (type2 && type2 !== "Any") params.set("type", type2);
+              if (near2 && near2 !== "Any") params.set("nearby", near2);
+              if (min2) params.set("minPrice", min2);
+              if (max2) params.set("maxPrice", max2);
 
-  navigate(`/properties?${params.toString()}`);
-}}
-/>
+              navigate(`/properties?${params.toString()}`);
+            }}
+          />
 
 
 
@@ -525,7 +525,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="flex flex-wrap justify-center gap-8 mt-8"
+            className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-6 sm:mt-8"
           >
             {[
               ["100% Verified", "Properties"],
@@ -549,7 +549,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
       {/* ================= HERO ================= */}
       <motion.section className="relative overflow-hidden py-20" {...section}>
         <div className="relative max-w-7xl mx-auto px-6 ">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -572,7 +572,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
                 <span>Hyderabad's Property Consultants</span>
               </motion.div>
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
                 Turning Dreams
                 <br />
                 Into{" "}
@@ -629,7 +629,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
               <div className="flex flex-wrap gap-3 pt-4">
                 <Link
                   to="/properties"
-                  className="group px-6 py-4 rounded-2xl font-semibold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
+                  className="group px-5 py-3 rounded-2xl font-semibold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
                   style={{
                     background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
                     color: theme.BG,
@@ -638,6 +638,19 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
                   <span className="relative z-10">Explore Properties</span>
                   <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                </Link>
+                <Link
+                  to="/list-property"
+                  className="group px-5 py-3 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 hover:scale-[1.02]"
+                  style={{
+                    border: `1.5px solid ${theme.GOLD}60`,
+                    color: theme.GOLD,
+                    backgroundColor: `${theme.ACCENT}40`,
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <HomeIcon className="h-5 w-5" color={theme.GOLD} />
+                  List Your Property
                 </Link>
                 <a
                   href="https://youtube.com/@vpfpropertieshyd"
@@ -650,28 +663,15 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
                     backgroundColor: `${theme.ACCENT}40`,
                   }}
                 >
-                  
+
                   <Youtube className="h-5 w-5" color={theme.GOLD} />
-                  Video Tours
+                 
                 </a>
-                <a
-  href="https://www.instagram.com/vpfproperties?igsh=NW16aWh3ajZ5b2R3"
-  target="_blank"
-  rel="noreferrer"
-  className="px-6 py-4 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
-  style={{
-    border: `1.5px solid ${theme.GOLD}60`,
-    color: theme.TEXT,
-    backgroundColor: `${theme.ACCENT}40`,
-  }}
->
-  <Instagram className="h-5 w-5" color={theme.GOLD} />
-  Instagram
-</a>
+                
 
               </div>
             </motion.div>
-            
+
 
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 32 }}
@@ -695,12 +695,12 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
                   }}
                 >
                   {site?.hero_image && (
-  <img
-    src={`${API_BASE_URL}${site.hero_image}`}
-    alt="Premium Hyderabad residence"
-    className="w-full h-[450px] object-cover"
-  />
-)}
+                    <img
+                      src={`${API_BASE_URL}${site.hero_image}`}
+                      alt="Premium Hyderabad residence"
+                      className="w-full h-[450px] object-cover"
+                    />
+                  )}
 
 
 
@@ -709,7 +709,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
                 </div>
 
                 <motion.div
-                  className="absolute -bottom-4 -left-4 px-5 py-3 rounded-2xl backdrop-blur-xl"
+                  className="absolute -bottom-3 left-2 sm:-bottom-4 sm:-left-4 px-3 sm:px-5 py-2 sm:py-3 rounded-2xl backdrop-blur-xl"
                   style={{
                     background: `linear-gradient(135deg, ${theme.ACCENT}E6 0%, ${theme.SURFACE}E6 100%)`,
                     border: `1px solid ${theme.GOLD}40`,
@@ -740,7 +740,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
             </motion.div>
           </div>
 
-          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-3 gap-4 max-w-3xl mt-8">
+          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl mt-8 w-full">
             {[
               // ["250+", "Site Visits", "Curated Tours"],
               ["120+", "Happy Families", "Satisfied Clients"],
@@ -856,7 +856,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featured.map((p) => (
             <motion.article
-            key={`${p.id}-${p._fid || ""}`}
+              key={`${p.id}-${p._fid || ""}`}
               variants={item}
               className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1 cursor-pointer"
               style={{
@@ -971,7 +971,7 @@ onApply={({ q, locality, bedrooms, type, nearby,minPrice, maxPrice }) => {
           />
         </div>
 
-       <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+        <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
 
           {videos.map((v) => (
             <button

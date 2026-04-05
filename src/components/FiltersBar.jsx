@@ -168,7 +168,7 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
 
   return (
     <div
-      className="rounded-2xl px-8 py-2 backdrop-blur-sm"
+     className="rounded-2xl px-4 sm:px-8 py-2 backdrop-blur-sm"
       style={{
         background: `linear-gradient(135deg, ${ACCENT}60 0%, ${SURFACE}40 100%)`,
         border: `1px solid ${LINE}`,
@@ -195,10 +195,10 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
       </div>
 
       {/* Filters Grid */}
-      <div className="grid grid-cols-12 gap-3 mb-4 items-end">
+     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-3 mb-4 items-end">
         {/* Min Price */}
         {showPriceRange && (
-          <div className="col-span-1">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
               Min Price
             </label>
@@ -220,7 +220,7 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
 
         {/* Max Price */}
         {showPriceRange && (
-          <div className="col-span-1">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <label className="block text-xs font-semibold mb-2" style={{ color: MUTED }}>
               Max Price
             </label>
@@ -389,7 +389,8 @@ const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
 
       {/* Apply button (Homepage use-case) */}
       {showApply && (
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+
           <div className="min-w-0 flex-1">{leftOfApply}</div>
 
           <button
