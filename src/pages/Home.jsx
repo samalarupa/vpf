@@ -87,24 +87,19 @@ const HYDERABAD_LOCALITIES = [
 ------------------------------ */
 function extractYouTubeId(url) {
   if (!url) return null;
-  // If already an id
   if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
   try {
     const u = new URL(url);
-    // youtube.com/watch?v=ID
     if (u.hostname.includes("youtube.com")) {
       if (u.searchParams.has("v")) return u.searchParams.get("v");
-      // playlist or other formats - fallback
       const p = u.pathname.split("/");
       return p.pop() || null;
     }
-    // youtu.be/ID
     if (u.hostname === "youtu.be") {
       const p = u.pathname.split("/");
       return p.pop() || null;
     }
   } catch (e) {
-    // fallback: try regex
     const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/);
     return m ? m[1] : null;
   }
@@ -115,25 +110,16 @@ function extractYouTubeId(url) {
    PAGE
 ------------------------------ */
 export default function Home() {
-  // const settings = useContext(SiteSettingsContext);
-
   const site = useContext(SiteSettingsContext);
   const popularLocalities = Array.isArray(site?.popular_localities)
     ? site.popular_localities
     : [];
 
-
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
-  // const [isDarkMode, setIsDarkMode] = useState(true);
   const isDarkMode = true; // forced
   const theme = DARK_THEME;
   const [showScrollTop, setShowScrollTop] = useState(false);
-  // const [activeTab, setActiveTab] = useState("buy");
-  // const [propertyType, setPropertyType] = useState("fullHouse");
-  // const [bhkType, setBhkType] = useState("");
-  // const [propertyStatus, setPropertyStatus] = useState("");
-  // const [newBuilder, setNewBuilder] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [featured, setFeatured] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -188,16 +174,13 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch featured, videos, reviews from backend
   useEffect(() => {
     async function load() {
       try {
         // FEATURED
         const fRes = await fetch(`${API_BASE_URL}/featured/list.php`);
         const fJson = await fRes.json();
-        // normalize featured to expected shape: id (property id), title, priceLakh, locality, image, tag
         const fNorm = (Array.isArray(fJson) ? fJson : []).map((f) => ({
-          // prefer property_id for navigation, but keep internal featured id as _fid
           id: f.property_id ?? f.id,
           _fid: f.id,
           title: f.title ?? "",
@@ -225,7 +208,6 @@ export default function Home() {
         });
         setVideos(vNorm);
         if (vNorm.length > 0 && !activeVideoId) {
-          // choose first available youtube id (or the raw videoUrl if no id)
           setActiveVideoId(vNorm[0].ytId || vNorm[0].videoUrl);
         }
 
@@ -244,7 +226,6 @@ export default function Home() {
       }
     }
     load();
-    // we only want this to run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -252,61 +233,11 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  const section = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, amount: 0.2 },
-    transition: { duration: prefersReducedMotion ? 0.2 : 0.8, ease: [0.22, 1, 0.36, 1] },
-  };
-
-  const stagger = {
-    hidden: {},
-    show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.1 } },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16, scale: prefersReducedMotion ? 1 : 0.96 },
-    show: { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
-  };
-  // function goToPropertiesWithLocality(locality) {
-  //   if (!locality) {
-  //     navigate("/properties");
-  //     return;
-  //   }
-  //   // encode and navigate
-  //   const q = new URLSearchParams({ locality: locality.trim() }).toString();
-  //   navigate(`/properties?${q}`);
-  // }
-
-  // const onSearchClick = () => {
-  //   if (!searchQuery || !searchQuery.trim()) {
-  //     // optional: navigate to properties without filter
-  //     navigate("/properties");
-  //     return;
-  //   }
-  //   goToPropertiesWithLocality(searchQuery);
-  // };
-
-
-
-  // allow Enter key in input to submit
-  // const onSearchKeyDown = (e) => {
-  //   if (e.key === "Enter") {
-  //     e.preventDefault();
-  //     onSearchClick();
-  //   }
-  // };
   function goToPropertiesWithLocality(locality) {
     if (!locality) {
       navigate("/properties");
       return;
     }
-
-    // Always send as q=<text> so that Properties page search bar updates
     const q = new URLSearchParams({ q: locality.trim() }).toString();
     navigate(`/properties?${q}`);
   }
@@ -326,11 +257,26 @@ export default function Home() {
     }
   };
 
+  const section = {
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, amount: 0.2 },
+    transition: { duration: prefersReducedMotion ? 0.2 : 0.8, ease: [0.22, 1, 0.36, 1] },
+  };
 
+  const stagger = {
+    hidden: {},
+    show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.1 } },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16, scale: prefersReducedMotion ? 1 : 0.96 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { duration: prefersReducedMotion ? 0.2 : 0.6, ease: [0.22, 1, 0.36, 1] } },
+  };
 
   return (
     <div
-      className="min-h-screen relative transition-colors duration-300 "
+      className="min-h-screen relative transition-colors duration-300"
       style={{
         backgroundColor: theme.BG,
         color: theme.TEXT,
@@ -447,8 +393,6 @@ export default function Home() {
           </motion.div>
 
           {/* Filter Bar */}
-
-
           <FiltersBar
             data={propertiesData}
             types={typesData}
@@ -458,15 +402,12 @@ export default function Home() {
             showSearchButton={true}
             leftOfApply={
               <div className="flex flex-col gap-2 pt-1">
-                {/* Label */}
                 <span
                   className="text-[11px] font-semibold tracking-wide uppercase"
                   style={{ color: theme.MUTED }}
                 >
                   Popular areas
                 </span>
-
-                {/* Chips */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                   {popularLocalities.map((loc) => (
                     <button
@@ -491,7 +432,6 @@ export default function Home() {
                 </div>
               </div>
             }
-
             onApply={({ q, locality, bedrooms, type, nearby, minPrice, maxPrice }) => {
               const params = new URLSearchParams();
 
@@ -514,11 +454,6 @@ export default function Home() {
               navigate(`/properties?${params.toString()}`);
             }}
           />
-
-
-
-
-
 
           {/* Trust Indicators */}
           <motion.div
@@ -546,174 +481,202 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* ================= HERO ================= */}
+    
+     {/* ================= HERO ================= */}
       <motion.section className="relative overflow-hidden py-20" {...section}>
-        <div className="relative max-w-7xl mx-auto px-6 ">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-6">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12" style={{ alignItems: "stretch" }}>
+
+            {/* Left content */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="space-y-6 z-10"
+              className="z-10 flex flex-col justify-center gap-6"
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-medium"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-                  border: `1px solid ${theme.GOLD}33`,
-                  boxShadow: `0 0 20px ${theme.GOLD}15`,
-                  color: theme.GOLD,
-                }}
-              >
-                <Sparkles size={14} />
-                <span>Hyderabad's Property Consultants</span>
-              </motion.div>
+              {/* Content */}
+              <div className="space-y-5">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-medium"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+                    border: `1px solid ${theme.GOLD}33`,
+                    boxShadow: `0 0 20px ${theme.GOLD}15`,
+                    color: theme.GOLD,
+                  }}
+                >
+                  <Sparkles size={14} />
+                  <span>Hyderabad's Property Consultants</span>
+                </motion.div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
-                Turning Dreams
-                <br />
-                Into{" "}
-                <span className="relative inline-block">
-                  <span
-                    className="relative z-10"
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 50%, ${theme.GOLD_D} 100%)`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    Addresses
+                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
+                  Turning Dreams
+                  <br />
+                  Into{" "}
+                  <span className="relative inline-block">
+                    <span
+                      className="relative z-10"
+                      style={{
+                        background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 50%, ${theme.GOLD_D} 100%)`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      Addresses
+                    </span>
+                    <motion.span
+                      className="absolute left-0 right-0 -bottom-2 h-2 rounded-full blur-sm"
+                      style={{
+                        background: `linear-gradient(90deg, ${theme.GOLD} 0%, ${theme.GOLD_L} 100%)`,
+                        opacity: 0.5,
+                      }}
+                      animate={{ opacity: [0.4, 0.7, 0.4] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    />
                   </span>
-                  <motion.span
-                    className="absolute left-0 right-0 -bottom-2 h-2 rounded-full blur-sm"
-                    style={{
-                      background: `linear-gradient(90deg, ${theme.GOLD} 0%, ${theme.GOLD_L} 100%)`,
-                      opacity: 0.5,
-                    }}
-                    animate={{ opacity: [0.4, 0.7, 0.4] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                </span>
-              </h1>
+                </h1>
 
-              <p className="text-lg leading-relaxed max-w-xl font-light" style={{ color: theme.MUTED }}>
-                We help families find beautiful, trusted homes across Hyderabad — with
-                clear details, honest guidance, and a smooth, worry-free buying experience.
-              </p>
+                <p className="text-lg leading-relaxed max-w-lg font-light" style={{ color: theme.MUTED }}>
+                  Beautiful, verified homes across Hyderabad — honest guidance, zero stress.
+                </p>
 
-              <div className="flex flex-wrap gap-2 pt-2">
-                {[
-                  [ShieldCheck, "Verified Titles"],
-                  [Award, "Premium Selection"],
-                  [Sparkles, "Concierge Service"],
-                ].map(([Icon, label]) => (
-                  <div
-                    key={label}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium"
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    [ShieldCheck, "Verified Titles"],
+                    [Award, "Premium Selection"],
+                    [Sparkles, "Concierge Service"],
+                  ].map(([Icon, label]) => (
+                    <div
+                      key={label}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
+                      style={{
+                        backgroundColor: `${theme.ACCENT}80`,
+                        border: `1px solid ${theme.LINE}`,
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      <Icon size={15} color={theme.GOLD} />
+                      <span>{label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <Link
+                    to="/properties"
+                    className="group px-6 py-3.5 rounded-2xl font-bold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
                     style={{
-                      backgroundColor: `${theme.ACCENT}80`,
-                      border: `1px solid ${theme.LINE}`,
-                      backdropFilter: "blur(10px)",
+                      background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
+                      color: theme.BG,
                     }}
                   >
-                    <Icon size={16} color={theme.GOLD} />
-                    <span>{label}</span>
-                  </div>
-                ))}
+                    <span className="relative z-10">Explore Properties</span>
+                    <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                  </Link>
+                  <Link
+                    to="/list-property"
+                    className="group px-6 py-3.5 rounded-2xl font-bold text-base flex items-center gap-3 transition-all duration-300 hover:scale-[1.02]"
+                    style={{
+                      border: `1.5px solid ${theme.GOLD}60`,
+                      color: theme.GOLD,
+                      backgroundColor: `${theme.ACCENT}40`,
+                      backdropFilter: "blur(8px)",
+                    }}
+                  >
+                    <HomeIcon className="h-5 w-5" color={theme.GOLD} />
+                    List Your Property
+                  </Link>
+                  <a
+                    href="https://youtube.com/@vpfpropertieshyd"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-5 py-3.5 rounded-2xl font-semibold flex items-center gap-2 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
+                    style={{
+                      border: `1.5px solid ${theme.GOLD}60`,
+                      color: theme.TEXT,
+                      backgroundColor: `${theme.ACCENT}40`,
+                    }}
+                  >
+                    <Youtube className="h-5 w-5" color={theme.GOLD} />
+                  </a>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-4">
-                <Link
-                  to="/properties"
-                  className="group px-5 py-3 rounded-2xl font-semibold text-base shadow-2xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 relative overflow-hidden"
-                  style={{
-                    background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
-                    color: theme.BG,
-                  }}
-                >
-                  <span className="relative z-10">Explore Properties</span>
-                  <ArrowRight className="h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
-                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
-                </Link>
-                <Link
-                  to="/list-property"
-                  className="group px-5 py-3 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 hover:scale-[1.02]"
-                  style={{
-                    border: `1.5px solid ${theme.GOLD}60`,
-                    color: theme.GOLD,
-                    backgroundColor: `${theme.ACCENT}40`,
-                    backdropFilter: "blur(8px)",
-                  }}
-                >
-                  <HomeIcon className="h-5 w-5" color={theme.GOLD} />
-                  List Your Property
-                </Link>
-                <a
-                  href="https://youtube.com/@vpfpropertieshyd"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-6 py-4 rounded-2xl font-semibold flex items-center gap-3 transition-all duration-300 backdrop-blur-sm hover:bg-white/5"
-                  style={{
-                    border: `1.5px solid ${theme.GOLD}60`,
-                    color: theme.TEXT,
-                    backgroundColor: `${theme.ACCENT}40`,
-                  }}
-                >
-
-                  <Youtube className="h-5 w-5" color={theme.GOLD} />
-                 
-                </a>
-                
-
+              {/* Bottom stats */}
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  ["120+", "Happy Families", "Satisfied Clients"],
+                  ["30+", "Prime Localities", "Across Hyderabad"],
+                ].map(([n, l, sub]) => (
+                  <motion.div
+                    key={l}
+                    variants={item}
+                    className="rounded-2xl p-5 backdrop-blur-sm relative overflow-hidden group cursor-pointer"
+                    style={{
+                      background: `linear-gradient(135deg, ${theme.ACCENT}80 0%, ${theme.SURFACE}60 100%)`,
+                      border: `1px solid ${theme.LINE}`,
+                    }}
+                  >
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: `radial-gradient(circle at 50% 0%, ${theme.GOLD}10, transparent 70%)` }}
+                    />
+                    <div className="relative z-10">
+                      <div
+                        className="text-2xl font-black mb-1"
+                        style={{
+                          background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        {n}
+                      </div>
+                      <div className="text-sm font-semibold">{l}</div>
+                      <div className="text-xs mt-0.5" style={{ color: theme.MUTED }}>{sub}</div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
 
-
+            {/* Right image */}
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 32 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="relative"
+              className="relative h-full"
+              style={{ minHeight: "520px" }}
             >
-              <div className="relative">
-                {isDarkMode && (
-                  <div
-                    className="absolute inset-0 rounded-3xl blur-3xl opacity-30"
-                    style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)` }}
+              <div
+                className="rounded-3xl overflow-hidden border w-full absolute inset-0"
+                style={{
+                  borderColor: `${theme.GOLD}35`,
+                  backgroundColor: theme.SURFACE,
+                }}
+              >
+                {site?.hero_image && (
+                  <img
+                    src={`${API_BASE_URL}${site.hero_image}`}
+                    alt="Premium Hyderabad residence"
+                    className="w-full h-full object-cover absolute inset-0"
                   />
                 )}
-                <div
-                  className="relative rounded-3xl overflow-hidden border-2"
-                  style={{
-                    borderColor: `${theme.GOLD}40`,
-                    boxShadow: `0 40px 100px rgba(0,0,0,.6), inset 0 0 0 1px ${theme.GOLD}20`,
-                    backgroundColor: theme.SURFACE,
-                  }}
-                >
-                  {site?.hero_image && (
-                    <img
-                      src={`${API_BASE_URL}${site.hero_image}`}
-                      alt="Premium Hyderabad residence"
-                      className="w-full h-[450px] object-cover"
-                    />
-                  )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-
-
-
-                  <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-black/60' : 'from-black/40'} via-transparent to-transparent`} />
-                </div>
-
+                {/* Badge — inside image, no overflow */}
                 <motion.div
-                  className="absolute -bottom-3 left-2 sm:-bottom-4 sm:-left-4 px-3 sm:px-5 py-2 sm:py-3 rounded-2xl backdrop-blur-xl"
+                  className="absolute bottom-4 left-4 px-4 py-3 rounded-2xl backdrop-blur-xl"
                   style={{
-                    background: `linear-gradient(135deg, ${theme.ACCENT}E6 0%, ${theme.SURFACE}E6 100%)`,
+                    background: `linear-gradient(135deg, ${theme.ACCENT}F0 0%, ${theme.SURFACE}F0 100%)`,
                     border: `1px solid ${theme.GOLD}40`,
-                    boxShadow: `0 20px 50px ${theme.BG}99`,
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -721,118 +684,22 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="h-10 w-10 rounded-xl flex items-center justify-center"
+                      className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)` }}
                     >
-                      <ShieldCheck size={20} color={theme.BG} />
+                      <ShieldCheck size={18} color={theme.BG} />
                     </div>
                     <div>
-                      <div className="text-sm font-bold" style={{ color: theme.GOLD }}>
-                        100% Verified
-                      </div>
-                      <div className="text-xs font-medium" style={{ color: theme.MUTED }}>
-                        Clear Titles Guaranteed
-                      </div>
+                      <div className="text-sm font-bold" style={{ color: theme.GOLD }}>100% Verified</div>
+                      <div className="text-xs" style={{ color: theme.MUTED }}>Clear Titles Guaranteed</div>
                     </div>
                   </div>
                 </motion.div>
               </div>
             </motion.div>
+
           </div>
-
-          <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl mt-8 w-full">
-            {[
-              // ["250+", "Site Visits", "Curated Tours"],
-              ["120+", "Happy Families", "Satisfied Clients"],
-              ["30+", "Prime Localities", "Across Hyderabad"],
-            ].map(([n, l, sub]) => (
-              <motion.div
-                key={l}
-                variants={item}
-                className="rounded-2xl text-center p-5 backdrop-blur-sm relative overflow-hidden group cursor-pointer"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.ACCENT}80 0%, ${theme.SURFACE}60 100%)`,
-                  border: `1px solid ${theme.LINE}`,
-                }}
-              >
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: `radial-gradient(circle at 50% 0%, ${theme.GOLD}10, transparent 70%)` }}
-                />
-                <div className="relative z-10">
-                  <div
-                    className="text-2xl font-black mb-1"
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    {n}
-                  </div>
-                  <div className="text-sm font-semibold">{l}</div>
-                  <div className="text-xs mt-1" style={{ color: theme.MUTED }}>
-                    {sub}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
-      </motion.section>
-
-      {/* ================= HIGHLIGHTS ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
-          >
-            WHY CHOOSE VPF PROPERTIES
-          </motion.div>
-          <h2 className="text-3xl md:text-4xl font-black mb-4">Excellence in Every Detail</h2>
-        </div>
-
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            [HomeIcon, "Premium Selection", "Hand-picked luxury homes and villas in Hyderabad's most coveted locations."],
-            [Landmark, "Legal Assurance", "Comprehensive verification with clear titles and vetted documentation."],
-            [Wallet, "Fair Valuation", "Transparent pricing with expert market insights for informed decisions."],
-            [Clock4, "Priority Service", "Expedited site visits with dedicated relationship managers."],
-          ].map(([Icon, h, p], i) => (
-            <motion.div
-              key={i}
-              variants={item}
-              className="group rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden hover:-translate-y-1 transition-all duration-500 cursor-pointer"
-              style={{
-                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-                border: `1px solid ${theme.LINE}`,
-                boxShadow: "0 8px 32px rgba(0,0,0,.2)",
-              }}
-            >
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ background: `radial-gradient(circle at 50% 0%, ${theme.GOLD}10, transparent 70%)` }}
-              />
-              <div className="relative z-10">
-                <div
-                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: `linear-gradient(135deg, ${theme.GOLD}20 0%, ${theme.GOLD}10 100%)`, border: `1px solid ${theme.GOLD}30` }}
-                >
-                  <Icon className="h-6 w-6" color={theme.GOLD} />
-                </div>
-                <div className="font-bold text-base mb-2">{h}</div>
-                <div className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
-                  {p}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
       </motion.section>
 
       {/* ================= FEATURED LISTINGS ================= */}
@@ -881,7 +748,6 @@ export default function Home() {
                 style={{ backgroundColor: `${theme.BG}B3` }}
                 aria-label="Save"
               >
-                {/* <Heart className="h-4 w-4" color={theme.GOLD} /> */}
               </button>
               <div className="relative overflow-hidden">
                 <img src={p.image} alt={p.title} className="w-full h-60 object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -972,7 +838,6 @@ export default function Home() {
         </div>
 
         <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
-
           {videos.map((v) => (
             <button
               key={v.id}
@@ -1007,6 +872,59 @@ export default function Home() {
             </button>
           ))}
         </div>
+      </motion.section>
+
+      {/* ================= HIGHLIGHTS ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-4"
+            style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+          >
+            WHY CHOOSE VPF PROPERTIES
+          </motion.div>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Excellence in Every Detail</h2>
+        </div>
+
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            [HomeIcon, "Premium Selection", "Hand-picked luxury homes and villas in Hyderabad's most coveted locations."],
+            [Landmark, "Legal Assurance", "Comprehensive verification with clear titles and vetted documentation."],
+            [Wallet, "Fair Valuation", "Transparent pricing with expert market insights for informed decisions."],
+            [Clock4, "Priority Service", "Expedited site visits with dedicated relationship managers."],
+          ].map(([Icon, h, p], i) => (
+            <motion.div
+              key={i}
+              variants={item}
+              className="group rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden hover:-translate-y-1 transition-all duration-500 cursor-pointer"
+              style={{
+                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+                border: `1px solid ${theme.LINE}`,
+                boxShadow: "0 8px 32px rgba(0,0,0,.2)",
+              }}
+            >
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: `radial-gradient(circle at 50% 0%, ${theme.GOLD}10, transparent 70%)` }}
+              />
+              <div className="relative z-10">
+                <div
+                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: `linear-gradient(135deg, ${theme.GOLD}20 0%, ${theme.GOLD}10 100%)`, border: `1px solid ${theme.GOLD}30` }}
+                >
+                  <Icon className="h-6 w-6" color={theme.GOLD} />
+                </div>
+                <div className="font-bold text-base mb-2">{h}</div>
+                <div className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
+                  {p}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.section>
 
       {/* ================= PROCESS ================= */}
@@ -1056,6 +974,114 @@ export default function Home() {
             </motion.div>
           ))}
         </motion.div>
+      </motion.section>
+
+     {/* ================= LIST YOUR PROPERTY CTA ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div
+          className="relative overflow-hidden rounded-3xl p-10 md:p-14"
+          style={{
+            background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+            border: `1px solid ${theme.GOLD}25`,
+            boxShadow: `0 32px 80px rgba(0,0,0,.4), inset 0 0 0 1px ${theme.GOLD}10`,
+          }}
+        >
+          {/* Glow */}
+          <div
+            className="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl opacity-15 pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${theme.GOLD}, transparent 70%)` }}
+          />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+
+            {/* Left */}
+            <div className="max-w-xl text-center lg:text-left">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
+                style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+              >
+                <HomeIcon size={12} />
+                FOR PROPERTY OWNERS
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-black mb-3 leading-tight">
+                Own a Property?{" "}
+                <span
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 50%, ${theme.GOLD_D} 100%)`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  List It With Us.
+                </span>
+              </h2>
+
+              <p className="text-sm leading-relaxed" style={{ color: theme.MUTED }}>
+                Reach thousands of verified buyers across Hyderabad. Zero upfront costs,
+                dedicated support, and a seamless end-to-end experience.
+              </p>
+            </div>
+
+            {/* Right: CTAs + quick stats */}
+            <div className="flex flex-col items-center lg:items-end gap-5 flex-shrink-0">
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
+                <Link
+                  to="/list-property"
+                  className="group px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl transition-all duration-300 hover:scale-[1.03] flex items-center gap-2 relative overflow-hidden"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.GOLD} 0%, ${theme.GOLD_D} 100%)`,
+                    color: theme.BG,
+                  }}
+                >
+                  <HomeIcon size={16} />
+                  <span className="relative z-10">List Your Property</span>
+                  <ArrowRight className="h-4 w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                </Link>
+                <a
+                  href="tel:+919999999999"
+                  className="px-6 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.03] flex items-center gap-2"
+                  style={{
+                    border: `1.5px solid ${theme.GOLD}50`,
+                    color: theme.GOLD,
+                    backgroundColor: `${theme.ACCENT}60`,
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <Phone size={15} />
+                  Talk to Us
+                </a>
+              </div>
+
+              {/* 3 micro-stats */}
+              <div className="flex gap-6">
+                {[
+                  ["500+", "Properties Sold"],
+                  ["18 Days", "Avg. to Sell"],
+                  ["₹0", "Listing Cost"],
+                ].map(([n, l]) => (
+                  <div key={l} className="text-center">
+                    <div
+                      className="text-lg font-black"
+                      style={{
+                        background: `linear-gradient(135deg, ${theme.GOLD_L} 0%, ${theme.GOLD} 100%)`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      {n}
+                    </div>
+                    <div className="text-[11px] font-medium mt-0.5" style={{ color: theme.MUTED }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
       </motion.section>
 
       {/* ================= REVIEWS ================= */}
@@ -1204,6 +1230,7 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
+
       <LocationSection />
 
       <div className="h-px max-w-7xl mx-auto" style={{ background: `linear-gradient(90deg, transparent, ${theme.GOLD}40, transparent)` }} />
