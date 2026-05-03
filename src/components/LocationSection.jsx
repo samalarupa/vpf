@@ -1,6 +1,6 @@
 export default function LocationSection() {
           return (
-            <section className="mt-16">
+            <section className="mt-16 mb-16">
               <div className="max-w-6xl mx-auto px-4 ">
                 
                 {/* Heading */}

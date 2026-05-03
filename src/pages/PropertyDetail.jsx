@@ -83,7 +83,6 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState(null);
   
   const [showVideo, setShowVideo] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [idx, setIdx] = useState(0);
   const site = useContext(SiteSettingsContext);
   const [shareOpen, setShareOpen] = useState(false);

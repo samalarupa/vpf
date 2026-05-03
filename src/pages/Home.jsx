@@ -795,85 +795,6 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* ================= VIDEO GALLERY ================= */}
-      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
-        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-          <div className="text-center md:text-left">
-            <div
-              className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-3"
-              style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
-            >
-              PROPERTY VIDEO TOURS
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black">Experience the Lifestyle</h2>
-            <p className="mt-2 text-sm" style={{ color: theme.MUTED }}>
-              Explore our projects through immersive video walkthroughs
-            </p>
-          </div>
-          <a
-            href="https://www.youtube.com/@vpfpropertieshyd/featured"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold"
-            style={{ border: `1px solid ${theme.GOLD}55`, color: theme.TEXT, backgroundColor: `${theme.ACCENT}60` }}
-          >
-            <Youtube size={16} color={theme.GOLD} />
-            Open Channel
-          </a>
-        </div>
-
-        <div
-          className="relative rounded-2xl overflow-hidden border shadow-xl"
-          style={{ borderColor: `${theme.GOLD}33`, background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)` }}
-        >
-          <iframe
-            key={activeVideoId || "empty"}
-            className="w-full h-[300px] md:h-[400px]"
-            src={activeVideoId && activeVideoId.length === 11 ? `https://www.youtube.com/embed/${activeVideoId}?rel=0&modestbranding=1` : activeVideoId}
-            title="VPF Properties Video"
-            frameBorder="0"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-
-        <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
-          {videos.map((v) => (
-            <button
-              key={v.id}
-              onClick={() => setActiveVideoId(v.ytId || v.videoUrl)}
-              className="flex-shrink-0 w-60 rounded-xl overflow-hidden border transition-transform hover:scale-[1.02]"
-              style={{
-                border: `1px solid ${v.ytId === activeVideoId ? theme.GOLD : theme.LINE}`,
-                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
-              }}
-            >
-              <div className="relative">
-                <img
-                  src={v.thumbnail || "/fallback-video.jpg"}
-                  alt={v.title}
-                  className="w-full h-32 object-cover"
-                />
-                <div className="absolute inset-0 grid place-items-center opacity-0 hover:opacity-100 transition-opacity">
-                  <div
-                    className="h-8 w-8 rounded-full grid place-items-center"
-                    style={{ backgroundColor: `${theme.BG}CC`, border: `1px solid ${theme.GOLD}66` }}
-                  >
-                    <Youtube size={16} color={theme.GOLD} />
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 text-left">
-                <div className="font-semibold">{v.title}</div>
-                <div className="text-xs mt-1" style={{ color: theme.MUTED }}>
-                  {v.description ? v.description.slice(0, 80) + (v.description.length > 80 ? "…" : "") : ""}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </motion.section>
-
       {/* ================= HIGHLIGHTS ================= */}
       <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
         <div className="text-center mb-12">
@@ -974,6 +895,85 @@ export default function Home() {
             </motion.div>
           ))}
         </motion.div>
+      </motion.section>
+
+      {/* ================= VIDEO GALLERY ================= */}
+      <motion.section className="max-w-7xl mx-auto px-6 py-16" {...section}>
+        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+          <div className="text-center md:text-left">
+            <div
+              className="inline-block px-4 py-2 rounded-full text-xs font-semibold mb-3"
+              style={{ backgroundColor: `${theme.GOLD}15`, color: theme.GOLD, border: `1px solid ${theme.GOLD}30` }}
+            >
+              PROPERTY VIDEO TOURS
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black">Experience the Lifestyle</h2>
+            <p className="mt-2 text-sm" style={{ color: theme.MUTED }}>
+              Explore our projects through immersive video walkthroughs
+            </p>
+          </div>
+          <a
+            href="https://www.youtube.com/@vpfpropertieshyd/featured"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold"
+            style={{ border: `1px solid ${theme.GOLD}55`, color: theme.TEXT, backgroundColor: `${theme.ACCENT}60` }}
+          >
+            <Youtube size={16} color={theme.GOLD} />
+            Open Channel
+          </a>
+        </div>
+
+        <div
+          className="relative rounded-2xl overflow-hidden border shadow-xl"
+          style={{ borderColor: `${theme.GOLD}33`, background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)` }}
+        >
+          <iframe
+            key={activeVideoId || "empty"}
+            className="w-full h-[300px] md:h-[400px]"
+            src={activeVideoId && activeVideoId.length === 11 ? `https://www.youtube.com/embed/${activeVideoId}?rel=0&modestbranding=1` : activeVideoId}
+            title="VPF Properties Video"
+            frameBorder="0"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+
+        <div className="mt-5 flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+          {videos.map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setActiveVideoId(v.ytId || v.videoUrl)}
+              className="flex-shrink-0 w-60 rounded-xl overflow-hidden border transition-transform hover:scale-[1.02]"
+              style={{
+                border: `1px solid ${v.ytId === activeVideoId ? theme.GOLD : theme.LINE}`,
+                background: `linear-gradient(135deg, ${theme.ACCENT} 0%, ${theme.SURFACE} 100%)`,
+              }}
+            >
+              <div className="relative">
+                <img
+                  src={v.thumbnail || "/fallback-video.jpg"}
+                  alt={v.title}
+                  className="w-full h-32 object-cover"
+                />
+                <div className="absolute inset-0 grid place-items-center opacity-0 hover:opacity-100 transition-opacity">
+                  <div
+                    className="h-8 w-8 rounded-full grid place-items-center"
+                    style={{ backgroundColor: `${theme.BG}CC`, border: `1px solid ${theme.GOLD}66` }}
+                  >
+                    <Youtube size={16} color={theme.GOLD} />
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 text-left">
+                <div className="font-semibold">{v.title}</div>
+                <div className="text-xs mt-1" style={{ color: theme.MUTED }}>
+                  {v.description ? v.description.slice(0, 80) + (v.description.length > 80 ? "…" : "") : ""}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
       </motion.section>
 
      {/* ================= LIST YOUR PROPERTY CTA ================= */}

@@ -16,12 +16,12 @@ const LINE = "#1F2847";
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const cls = ({ isActive }) =>
-    `px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-      isActive 
-        ? `bg-gradient-to-r from-${GOLD} to-${GOLD_D} text-[${BG}] shadow-lg`
-        : `text-[${TEXT}] hover:text-[${GOLD}] hover:bg-white/5`
-    }`;
+  // const cls = ({ isActive }) =>
+  //   `px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+  //     isActive 
+  //       ? `bg-gradient-to-r from-${GOLD} to-${GOLD_D} text-[${BG}] shadow-lg`
+  //       : `text-[${TEXT}] hover:text-[${GOLD}] hover:bg-white/5`
+  //   }`;
 
   const activeLinkStyle = ({ isActive }) => ({
     background: isActive 
