@@ -1,128 +1,181 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const GOLD   = "#D4AF37";
+const GOLD_D = "#B8963A";
 
 export default function ImageCarousel({ images = [] }) {
   const [index, setIndex] = useState(0);
 
+  /* Touch / swipe */
+  const touchStartX = useRef(null);
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd   = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
+    touchStartX.current = null;
+  };
+
   if (!images.length) return null;
 
-  const prev = () =>
-    setIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  const prev = () => setIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
 
-  const next = () =>
-    setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
+  const ArrowBtn = ({ onClick, children, className = "" }) => (
+    <button
+      onClick={onClick}
+      className={`flex items-center justify-center rounded-2xl
+                  bg-black/50 backdrop-blur-md
+                  border border-yellow-400/40
+                  hover:bg-black/80 hover:scale-110
+                  transition-all shadow-xl ${className}`}
+      style={{ borderColor: `${GOLD}55` }}
+    >
+      {children}
+    </button>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* ===== Main Row ===== */}
-      <div className="flex items-center justify-center gap-8">
-        {/* LEFT ARROW */}
-        {images.length > 1 && (
-          <button
-            onClick={prev}
-            className="hidden md:flex h-14 w-14 rounded-2xl
-                       items-center justify-center
-                       bg-black/50 backdrop-blur-md
-                       border border-yellow-400/40
-                       hover:bg-black/80 hover:scale-110
-                       transition-all shadow-xl"
-          >
-            <ChevronLeft size={28} className="text-yellow-400" />
-          </button>
-        )}
+    <div className="w-full space-y-3 sm:space-y-4">
 
-        {/* IMAGE FRAME (FIXED SIZE) */}
+      {/* ── Main viewer row ──
+          Arrows sit INSIDE the image on xs/sm (overlaid),
+          OUTSIDE on md+ (flanking) to avoid taking width.
+      */}
+      <div className="relative w-full">
+
+        {/* Image frame — fully fluid */}
         <div
-          className="
-            relative
-            w-[2000px]          /* FIXED WIDTH */
-            h-[580px]          /* FIXED HEIGHT */
-            rounded-3xl
-            overflow-hidden
-            border border-white/10
-            shadow-[0_40px_100px_rgba(0,0,0,0.6)]
-            bg-black
-          "
+          className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-black border border-white/10"
+          style={{
+            /*
+              Aspect ratio scales the height automatically:
+              - xs/sm : 4/3  → taller, suits portrait crops on phones
+              - md+   : 16/9 → cinematic landscape on desktop
+              Tailwind doesn't ship aspect-ratio utilities for arbitrary values,
+              so we use the padding-top trick via inline style.
+            */
+            aspectRatio: "16/9",
+            boxShadow: "0 24px 80px rgba(0,0,0,0.55)",
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <img
+            key={index}               /* remount on change for a crisp swap */
             src={images[index]}
             alt={`Property image ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
+            draggable={false}
           />
 
-          {/* Counter */}
+          {/* Counter badge */}
           {images.length > 1 && (
             <div
-              className="
-                absolute bottom-4 right-4
-                px-4 py-1.5 rounded-full
-                text-sm font-semibold
-                bg-black/70 text-yellow-400
-                border border-yellow-400/30
-              "
+              className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4
+                         px-3 py-1 sm:px-4 sm:py-1.5 rounded-full
+                         text-xs sm:text-sm font-semibold
+                         bg-black/70"
+              style={{ color: GOLD, border: `1px solid ${GOLD}40` }}
             >
               {index + 1} / {images.length}
             </div>
           )}
+
+          {/* Overlaid arrows — xs/sm only */}
+          {images.length > 1 && (
+            <>
+              <ArrowBtn
+                onClick={prev}
+                className="md:hidden absolute left-2 sm:left-3 top-1/2 -translate-y-1/2
+                           h-9 w-9 sm:h-11 sm:w-11"
+              >
+                <ChevronLeft size={20} style={{ color: GOLD }} />
+              </ArrowBtn>
+              <ArrowBtn
+                onClick={next}
+                className="md:hidden absolute right-2 sm:right-3 top-1/2 -translate-y-1/2
+                           h-9 w-9 sm:h-11 sm:w-11"
+              >
+                <ChevronRight size={20} style={{ color: GOLD }} />
+              </ArrowBtn>
+            </>
+          )}
         </div>
 
-        {/* RIGHT ARROW */}
+        {/* Flanking arrows — md+ only, sit outside the frame */}
         {images.length > 1 && (
-          <button
-            onClick={next}
-            className="hidden md:flex h-14 w-14 rounded-2xl
-                       items-center justify-center
-                       bg-black/50 backdrop-blur-md
-                       border border-yellow-400/40
-                       hover:bg-black/80 hover:scale-110
-                       transition-all shadow-xl"
-          >
-            <ChevronRight size={28} className="text-yellow-400" />
-          </button>
+          <>
+            <ArrowBtn
+              onClick={prev}
+              className="hidden md:flex absolute -left-5 lg:-left-7 top-1/2 -translate-y-1/2
+                         h-12 w-12 lg:h-14 lg:w-14 z-10"
+            >
+              <ChevronLeft size={24} style={{ color: GOLD }} />
+            </ArrowBtn>
+            <ArrowBtn
+              onClick={next}
+              className="hidden md:flex absolute -right-5 lg:-right-7 top-1/2 -translate-y-1/2
+                         h-12 w-12 lg:h-14 lg:w-14 z-10"
+            >
+              <ChevronRight size={24} style={{ color: GOLD }} />
+            </ArrowBtn>
+          </>
         )}
       </div>
 
-      {/* ===== Mobile Arrows ===== */}
+      {/* ── Dot indicators (xs/sm) — compact alternative to thumbnails ── */}
       {images.length > 1 && (
-        <div className="flex md:hidden justify-center gap-6">
-          <button
-            onClick={prev}
-            className="h-12 w-12 rounded-xl flex items-center justify-center
-                       bg-black/60 border border-yellow-400/40"
-          >
-            <ChevronLeft size={24} className="text-yellow-400" />
-          </button>
-          <button
-            onClick={next}
-            className="h-12 w-12 rounded-xl flex items-center justify-center
-                       bg-black/60 border border-yellow-400/40"
-          >
-            <ChevronRight size={24} className="text-yellow-400" />
-          </button>
+        <div className="flex sm:hidden justify-center gap-1.5 pt-1">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className="rounded-full transition-all"
+              style={{
+                width:  i === index ? 20 : 8,
+                height: 8,
+                background: i === index
+                  ? `linear-gradient(90deg, ${GOLD}, ${GOLD_D})`
+                  : "rgba(255,255,255,0.2)",
+              }}
+              aria-label={`Go to image ${i + 1}`}
+            />
+          ))}
         </div>
       )}
 
-      {/* ===== Thumbnails ===== */}
+      {/* ── Thumbnails — sm+ only ──
+          Horizontally scrollable row, thumbnails scale with breakpoint.
+      */}
       {images.length > 1 && (
-        <div className="flex gap-4 justify-center overflow-x-auto pb-2">
+        <div className="hidden sm:flex gap-2 sm:gap-3 justify-center overflow-x-auto pb-1 px-1">
           {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}
-              className={`
-                rounded-xl overflow-hidden transition-all
-                border
-                ${
-                  i === index
-                    ? "border-yellow-400 shadow-[0_0_24px_rgba(212,175,55,0.45)]"
-                    : "border-white/10 opacity-70 hover:opacity-100"
-                }
-              `}
+              className="shrink-0 rounded-xl overflow-hidden transition-all"
+              style={{
+                /*
+                  Thumbnail size:
+                  sm: 80×56  md: 96×64  lg: 112×76
+                  We use inline style so clamp() works without custom config.
+                */
+                width:  "clamp(80px, 10vw, 112px)",
+                height: "clamp(56px, 7vw,  76px)",
+                border: i === index
+                  ? `2px solid ${GOLD}`
+                  : "1px solid rgba(255,255,255,0.12)",
+                opacity: i === index ? 1 : 0.65,
+                boxShadow: i === index ? `0 0 20px ${GOLD}45` : "none",
+              }}
             >
               <img
                 src={img}
                 alt={`Thumbnail ${i + 1}`}
-                className="h-20 w-28 object-cover"
+                className="w-full h-full object-cover"
+                draggable={false}
               />
             </button>
           ))}
