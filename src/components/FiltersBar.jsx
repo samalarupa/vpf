@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Search, X, ChevronDown } from "lucide-react";
 
 const BG      = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -12,15 +12,12 @@ const LINE    = "#1F2847";
 
 /* ─────────────────────────────────────────
    CustomSelect
-   - Dropdown flips to "top" when near bottom of viewport
-   - Max-height + scroll so it never overflows on small screens
 ───────────────────────────────────────── */
 function CustomSelect({ label, value, onChange, options }) {
   const [open, setOpen] = useState(false);
-  const ref  = useRef(null);
+  const ref     = useRef(null);
   const listRef = useRef(null);
 
-  /* Close on outside click */
   useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
@@ -29,7 +26,6 @@ function CustomSelect({ label, value, onChange, options }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  /* Flip dropdown above button if too close to viewport bottom */
   const [dropUp, setDropUp] = useState(false);
   const handleOpen = () => {
     if (ref.current) {
@@ -59,7 +55,6 @@ function CustomSelect({ label, value, onChange, options }) {
           boxShadow: open ? `0 0 0 3px ${GOLD}25` : "none",
         }}
       >
-        {/* Truncate long option names gracefully */}
         <span className="truncate pr-2 text-xs sm:text-sm">{value}</span>
         <ChevronDown
           size={14}
@@ -77,12 +72,10 @@ function CustomSelect({ label, value, onChange, options }) {
           ref={listRef}
           className="absolute z-50 w-full rounded-xl overflow-hidden overflow-y-auto"
           style={{
-            /* Flip above or below */
             ...(dropUp ? { bottom: "calc(100% + 6px)" } : { top: "calc(100% + 6px)" }),
             background: SURFACE,
             border: `1px solid ${GOLD}30`,
             boxShadow: `0 16px 40px rgba(0,0,0,0.6), 0 0 0 1px ${LINE}`,
-            /* Never taller than 40vh so it fits on short/small screens */
             maxHeight: "40vh",
           }}
         >
@@ -122,7 +115,7 @@ function CustomSelect({ label, value, onChange, options }) {
 }
 
 /* ─────────────────────────────────────────
-   FiltersBar
+   FiltersBar — filters always visible on all screen sizes
 ───────────────────────────────────────── */
 export default function FiltersBar({
   data = [],
@@ -149,9 +142,6 @@ export default function FiltersBar({
   const [nearby,   setNearby]   = useState(initialNearby   || "Any");
   const [minPrice, setMinPrice] = useState(initialMinPrice || "");
   const [maxPrice, setMaxPrice] = useState(initialMaxPrice || "");
-
-  /* On xs/sm, hide the selects behind a toggle */
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const debounceRef = useRef(null);
 
@@ -189,7 +179,6 @@ export default function FiltersBar({
     (showPriceRange && (minPrice || maxPrice)) ||
     locality !== "All" || bedrooms !== "Any" || type !== "Any" || nearby !== "Any" || q;
 
-  /* Count active (non-search) filters for the mobile badge */
   const activeFilterCount = [
     showPriceRange && (minPrice || maxPrice),
     locality !== "All",
@@ -232,66 +221,6 @@ export default function FiltersBar({
   const bedroomOptions = ["Any", "1 BHK", "2 BHK", "3 BHK", "4 BHK"];
   const typeOptions    = ["Any", ...(types?.length ? types : ["Flat", "Villa", "Plot"])];
 
-  /* ── Select filters panel (shown differently per breakpoint) ── */
-  const SelectFilters = () => (
-    <>
-      {/* Price range — full row on xs when shown */}
-      {showPriceRange && (
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: MUTED }}>
-              Min Price
-            </label>
-            <input
-              value={minPrice}
-              onChange={(e) => setMinPrice(onlyNum(e.target.value))}
-              placeholder="₹ Lakh"
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none transition ${placeholderClass}`}
-              style={inputStyle}
-              inputMode="numeric"
-              onFocus={(e) => Object.assign(e.currentTarget.style, focusRing)}
-              onBlur={(e)  => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = LINE; }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: MUTED }}>
-              Max Price
-            </label>
-            <input
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(onlyNum(e.target.value))}
-              placeholder="₹ Lakh"
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none transition ${placeholderClass}`}
-              style={inputStyle}
-              inputMode="numeric"
-              onFocus={(e) => Object.assign(e.currentTarget.style, focusRing)}
-              onBlur={(e)  => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = LINE; }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/*
-        Select grid:
-        - xs:  2 columns  (2×2 = 4 selects)
-        - sm:  2 columns
-        - md:  4 columns  (all 4 in one row)
-        - lg:  4 columns
-      */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <CustomSelect label="Locality" value={locality}  onChange={setLocality}  options={localityOptions} />
-        <CustomSelect label="Nearby"   value={nearby}    onChange={setNearby}    options={nearbyOptions}  />
-        <CustomSelect label="Type"     value={type}      onChange={setType}      options={typeOptions}    />
-        <CustomSelect
-          label="Bedrooms"
-          value={bedrooms === "Any" ? "Any" : bedrooms.includes("BHK") ? bedrooms : `${bedrooms} BHK`}
-          onChange={(v) => setBedrooms(v === "Any" ? "Any" : v.replace(" BHK", ""))}
-          options={bedroomOptions}
-        />
-      </div>
-    </>
-  );
-
   return (
     <div
       className="rounded-2xl px-3 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-4 backdrop-blur-sm"
@@ -300,10 +229,9 @@ export default function FiltersBar({
         border: `1px solid ${LINE}`,
       }}
     >
-      {/* ── Top row: search + filter toggle (xs/sm) | search only (md+) ── */}
+      {/* ── Top row: search + clear ── */}
       <div className="flex items-end gap-2 sm:gap-3">
 
-        {/* Search — always visible, takes remaining width */}
         {showSearch && (
           <div className="flex-1 min-w-0">
             <label className="block text-xs font-semibold mb-1.5" style={{ color: MUTED }}>
@@ -338,42 +266,6 @@ export default function FiltersBar({
           </div>
         )}
 
-        {/* Filter toggle button — xs/sm only */}
-        <div className="md:hidden shrink-0">
-          {!showSearch && (
-            <label className="block text-xs font-semibold mb-1.5 invisible" style={{ color: MUTED }}>
-              &nbsp;
-            </label>
-          )}
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            className="relative h-[42px] sm:h-[46px] px-3 sm:px-4 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all"
-            style={{
-              background: filtersOpen
-                ? `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`
-                : `linear-gradient(135deg, ${ACCENT}90 0%, ${SURFACE}60 100%)`,
-              border: `1px solid ${filtersOpen ? GOLD : LINE}`,
-              color: filtersOpen ? BG : TEXT,
-            }}
-            aria-expanded={filtersOpen}
-            aria-label="Toggle filters"
-          >
-            <SlidersHorizontal size={15} />
-            <span className="hidden sm:inline">Filters</span>
-            {/* Active filter count badge */}
-            {activeFilterCount > 0 && (
-              <span
-                className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full text-[10px] font-black flex items-center justify-center"
-                style={{ background: GOLD, color: BG }}
-              >
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Clear all — top-right, only when filters active */}
         {hasActiveFilters && (
           <button
             onClick={clearAll}
@@ -386,27 +278,67 @@ export default function FiltersBar({
             type="button"
           >
             <X size={13} />
-            <span className="hidden sm:inline">Clear</span>
+            <span>Clear</span>
           </button>
         )}
       </div>
 
-      {/* ── Select filters ──
-          md+: always visible below search
-          xs/sm: collapsible panel
-      */}
+      {/* ── Select filters — always visible on ALL screen sizes ── */}
+      <div className="flex flex-col gap-3 mt-3">
 
-      {/* Desktop: always shown */}
-      <div className="hidden md:flex flex-col gap-3 mt-3">
-        <SelectFilters />
-      </div>
+        {/* Price range */}
+        {showPriceRange && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: MUTED }}>
+                Min Price
+              </label>
+              <input
+                value={minPrice}
+                onChange={(e) => setMinPrice(onlyNum(e.target.value))}
+                placeholder="₹ Lakh"
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none transition ${placeholderClass}`}
+                style={inputStyle}
+                inputMode="numeric"
+                onFocus={(e) => Object.assign(e.currentTarget.style, focusRing)}
+                onBlur={(e)  => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = LINE; }}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: MUTED }}>
+                Max Price
+              </label>
+              <input
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(onlyNum(e.target.value))}
+                placeholder="₹ Lakh"
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium focus:outline-none transition ${placeholderClass}`}
+                style={inputStyle}
+                inputMode="numeric"
+                onFocus={(e) => Object.assign(e.currentTarget.style, focusRing)}
+                onBlur={(e)  => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = LINE; }}
+              />
+            </div>
+          </div>
+        )}
 
-      {/* Mobile: collapsible */}
-      {filtersOpen && (
-        <div className="md:hidden flex flex-col gap-3 mt-3 pt-3" style={{ borderTop: `1px solid ${LINE}` }}>
-          <SelectFilters />
+        {/*
+          Select grid:
+          - xs/sm: 2 columns
+          - md+:   4 columns
+        */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <CustomSelect label="Locality" value={locality}  onChange={setLocality}  options={localityOptions} />
+          <CustomSelect label="Nearby"   value={nearby}    onChange={setNearby}    options={nearbyOptions}  />
+          <CustomSelect label="Type"     value={type}      onChange={setType}      options={typeOptions}    />
+          <CustomSelect
+            label="Bedrooms"
+            value={bedrooms === "Any" ? "Any" : bedrooms.includes("BHK") ? bedrooms : `${bedrooms} BHK`}
+            onChange={(v) => setBedrooms(v === "Any" ? "Any" : v.replace(" BHK", ""))}
+            options={bedroomOptions}
+          />
         </div>
-      )}
+      </div>
 
       {/* ── Apply button row ── */}
       {showApply && (
