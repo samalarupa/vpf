@@ -73,7 +73,7 @@ export default function LocationSection() {
             </div>
 
             <a
-              href="https://www.google.com/maps/place/VPF+Properties/@17.4947163,78.4048628"
+              href="https://www.google.com/maps/place/VPF+Properties/@17.4947214,78.4022825,17z/data=!3m1!4b1!4m6!3m5!1s0x3bcb91004eea7da5:0xc38d9ec20b9ec509!8m2!3d17.4947163!4d78.4048628!16s%2Fg%2F11mcp9blbw?authuser=0&entry=ttu&g_ep=EgoyMDI2MDUzMS4wIKXMDSoASAFQAw%3D%3D"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:scale-105 hover:shadow-lg w-full sm:w-auto shrink-0"
