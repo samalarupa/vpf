@@ -71,7 +71,7 @@ export default function Navbar() {
               className="relative z-10"
               style={{ color: BG, width: "clamp(16px,3vw,24px)", height: "clamp(16px,3vw,24px)" }}
             /> */}
-            <img src="../public/favicon.png" alt="" />
+            <img src="/favicon.png" alt="" />
             {/* <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
               style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.2), transparent)" }}
