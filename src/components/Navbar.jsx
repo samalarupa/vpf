@@ -64,7 +64,7 @@ export default function Navbar() {
             className="h-9 w-9 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 relative overflow-hidden"
             style={{
               background: `transparent`,
-              boxShadow: `0 8px 24px ${GOLD}30`,
+              // boxShadow: `0 8px 24px ${GOLD}30`,
             }}
           >
             {/* <Crown
