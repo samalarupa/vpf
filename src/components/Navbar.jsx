@@ -63,14 +63,15 @@ export default function Navbar() {
           <div
             className="h-9 w-9 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 relative overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_D} 100%)`,
+              background: `transparent`,
               boxShadow: `0 8px 24px ${GOLD}30`,
             }}
           >
-            <Crown
+            {/* <Crown
               className="relative z-10"
               style={{ color: BG, width: "clamp(16px,3vw,24px)", height: "clamp(16px,3vw,24px)" }}
-            />
+            /> */}
+            <img src="../public/favicon.png" alt="" />
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
               style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.2), transparent)" }}
