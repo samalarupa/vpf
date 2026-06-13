@@ -32,6 +32,7 @@ import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 import ReviewForm from "../components/ReviewForm";
 import ImageCarousel from "../components/ImageCarousel";
+import { Helmet } from "react-helmet-async";
 
 const BG = "#0A0E27";
 const SURFACE = "#141B3A";
@@ -206,6 +207,16 @@ export default function PropertyDetail() {
     videoUrl,
   } = property;
 
+  const seoTitle = `${title} | ${locality}, ${city || "Hyderabad"} | VPF Properties`;
+
+const seoDescription = `${
+  property_type || "Property"
+} for sale in ${locality}, ${
+  city || "Hyderabad"
+}. Price ₹${priceLakh} Lakhs. Explore verified property details, images, amenities and contact VPF Properties today.`;
+
+const canonicalUrl = `https://vpfproperties.com/property/${id}`;
+
   let images = [];
   if (property.gallery_images) {
     if (Array.isArray(property.gallery_images)) {
@@ -244,6 +255,67 @@ export default function PropertyDetail() {
   };
 
   return (
+    <>
+    <Helmet>
+      <title>{seoTitle}</title>
+
+      <meta
+        name="description"
+        content={seoDescription}
+      />
+
+      <meta
+        name="keywords"
+        content="VPF Properties,
+Properties in Hyderabad,
+Flats for Sale Hyderabad,
+Villas for Sale Hyderabad,
+Apartments for Sale Hyderabad,
+Property Listings Hyderabad,
+Real Estate Hyderabad,
+Property Dealers Hyderabad,
+Property Consultants Hyderabad,
+Buy Property Hyderabad,
+Residential Properties Hyderabad,
+Commercial Properties Hyderabad,
+Premium Properties Hyderabad,
+Luxury Villas Hyderabad,
+Luxury Flats Hyderabad,
+Verified Properties Hyderabad,
+Property Broker Hyderabad,
+Hyderabad Real Estate,
+Homes for Sale Hyderabad,
+Investment Properties Hyderabad,
+Kukatpally Properties,
+Miyapur Properties,
+Bachupally Properties,
+Nizampet Properties,
+Hyderabad Property Listings"
+      />
+
+      <link
+        rel="canonical"
+        href={canonicalUrl}
+      />
+
+      <meta property="og:title" content={seoTitle} />
+
+      <meta
+        property="og:description"
+        content={seoDescription}
+      />
+
+      <meta property="og:type" content="website" />
+
+      <meta property="og:url" content={canonicalUrl} />
+
+      {image && (
+        <meta
+          property="og:image"
+          content={image}
+        />
+      )}
+    </Helmet>
     <div
       className="min-h-screen relative"
       style={{
@@ -703,6 +775,7 @@ export default function PropertyDetail() {
         onCopy={copyLink}
       />
     </div>
+    </>
   );
 }
 

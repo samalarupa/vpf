@@ -4,6 +4,7 @@ import FiltersBar from "../components/FiltersBar.jsx";
 import PropertyCard from "../components/PropertyCard.jsx";
 import { Sparkles, SlidersHorizontal, ChevronRight, Home } from "lucide-react";
 import { API_BASE_URL } from "../config";
+import { Helmet } from "react-helmet-async";
 
 const parseBedrooms = (value) => {
   if (value === null || value === undefined) return null;
@@ -169,6 +170,52 @@ export default function Properties() {
   );
 
   return (
+    <>
+    <Helmet>
+      <title>
+        Properties for Sale in Hyderabad | VPF Properties
+      </title>
+
+      <meta
+        name="description"
+        content="Browse verified flats, villas, apartments and premium properties for sale in Hyderabad. Find your ideal home with VPF Properties."
+      />
+
+      <meta
+        name="keywords"
+        content="VPF Properties,
+Properties in Hyderabad,
+Flats for Sale Hyderabad,
+Villas for Sale Hyderabad,
+Apartments for Sale Hyderabad,
+Property Listings Hyderabad,
+Real Estate Hyderabad,
+Property Dealers Hyderabad,
+Property Consultants Hyderabad,
+Buy Property Hyderabad,
+Residential Properties Hyderabad,
+Commercial Properties Hyderabad,
+Premium Properties Hyderabad,
+Luxury Villas Hyderabad,
+Luxury Flats Hyderabad,
+Verified Properties Hyderabad,
+Property Broker Hyderabad,
+Hyderabad Real Estate,
+Homes for Sale Hyderabad,
+Investment Properties Hyderabad,
+Kukatpally Properties,
+Miyapur Properties,
+Bachupally Properties,
+Nizampet Properties,
+Hyderabad Property Listings"
+      />
+
+      <link
+        rel="canonical"
+        href="https://vpfproperties.com/properties"
+      />
+    </Helmet>
+
     <div
       className="min-h-screen relative"
       style={{
@@ -326,5 +373,6 @@ export default function Properties() {
         )}
       </section>
     </div>
+    </>
   );
 }

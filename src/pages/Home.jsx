@@ -27,6 +27,7 @@ import { API_BASE_URL } from "../config";
 import { useContext } from "react";
 import { SiteSettingsContext } from "../context/SiteSettingsContext.jsx";
 import LocationSection from "../components/LocationSection";
+import { Helmet } from "react-helmet-async";
 
 
 /* -----------------------------
@@ -275,6 +276,51 @@ export default function Home() {
   };
 
   return (
+    <>
+    <Helmet>
+      <title>
+        VPF Properties | Property Dealers & Real Estate Consultants in Hyderabad
+      </title>
+
+      <meta
+        name="description"
+        content="VPF Properties helps buyers and sellers find flats, villas and plots in Hyderabad. Explore verified property listings, premium homes and investment opportunities."
+      />
+
+      <meta
+        name="keywords"
+        content="VPF Properties,
+Properties in Hyderabad,
+Flats for Sale Hyderabad,
+Villas for Sale Hyderabad,
+Apartments for Sale Hyderabad,
+Property Listings Hyderabad,
+Real Estate Hyderabad,
+Property Dealers Hyderabad,
+Property Consultants Hyderabad,
+Buy Property Hyderabad,
+Residential Properties Hyderabad,
+Commercial Properties Hyderabad,
+Premium Properties Hyderabad,
+Luxury Villas Hyderabad,
+Luxury Flats Hyderabad,
+Verified Properties Hyderabad,
+Property Broker Hyderabad,
+Hyderabad Real Estate,
+Homes for Sale Hyderabad,
+Investment Properties Hyderabad,
+Kukatpally Properties,
+Miyapur Properties,
+Bachupally Properties,
+Nizampet Properties,
+Hyderabad Property Listings, Property Broker In Kukatpally"
+      />
+
+      <link
+        rel="canonical"
+        href="https://vpfproperties.com/"
+      />
+    </Helmet>
     <div
       className="min-h-screen relative transition-colors duration-300"
       style={{
@@ -1303,5 +1349,6 @@ export default function Home() {
 
       <div className="h-px max-w-7xl mx-auto" style={{ background: `linear-gradient(90deg, transparent, ${theme.GOLD}40, transparent)` }} />
     </div>
+    </>
   );
 }

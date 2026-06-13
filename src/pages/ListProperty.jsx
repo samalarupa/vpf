@@ -526,7 +526,7 @@ export default function ListProperty() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 lg:gap-8 mt-6 sm:mt-8 lg:mt-10"
         >
-          {[["🔒", "Secure & Private"], ["⚡", "Listed within 24hrs"], ["✅", "Verified Buyers Only"], ["💬", "Dedicated Support"]].map(([e, l]) => (
+          {[["Secure & Private"], ["Listed within 24hrs"], ["Verified Buyers Only"], ["Dedicated Support"]].map(([e, l]) => (
             <div key={l} className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm" style={{ color: T.MUTED }}>
               <span>{e}</span><span>{l}</span>
             </div>
