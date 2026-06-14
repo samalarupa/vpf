@@ -292,6 +292,18 @@ Bachupally Properties,
 Nizampet Properties,
 Hyderabad Property Listings"
       />
+      <meta
+  name="keywords"
+  content={`
+    ${title},
+    ${property_type},
+    Property for Sale ${locality},
+    ${property_type} in ${locality},
+    Property in ${city},
+    Real Estate Hyderabad,
+    VPF Properties
+  `}
+/>
 
       <link
         rel="canonical"
