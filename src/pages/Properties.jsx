@@ -178,7 +178,7 @@ export default function Properties() {
 
       <meta
         name="description"
-        content="Browse verified flats, villas, apartments and premium properties for sale in Hyderabad. Find your ideal home with VPF Properties."
+        content="Browse verified flats, villas, apartments, independent houses and plots for sale in Hyderabad. Explore properties by locality, budget and property type with VPF Properties."
       />
 
       <meta

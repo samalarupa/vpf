@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../config";
+import { Helmet } from "react-helmet-async";
 
 const T = {
   BG: "#0A0E27",
@@ -169,6 +170,22 @@ export default function ListProperty() {
      MAIN FORM
   ════════════════════════════════════════ */
   return (
+    <>
+  <Helmet>
+    <title>
+      List Your Property in Hyderabad | VPF Properties
+    </title>
+
+    <meta
+      name="description"
+      content="List your flat, villa, apartment, plot or commercial property in Hyderabad with VPF Properties and connect with verified buyers."
+    />
+
+    <link
+      rel="canonical"
+      href="https://vpfproperties.com/list-property"
+    />
+  </Helmet>
     <div
       className="min-h-screen relative"
       style={{
@@ -534,5 +551,6 @@ export default function ListProperty() {
         </motion.div>
       </section>
     </div>
+    </>
   );
 }
