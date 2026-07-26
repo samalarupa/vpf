@@ -70,7 +70,7 @@ function CustomSelect({ label, value, onChange, options }) {
       {open && (
         <div
           ref={listRef}
-          className="absolute z-50 w-full rounded-xl overflow-hidden overflow-y-auto"
+          className="absolute z-[9999] w-full rounded-xl overflow-hidden overflow-y-auto"
           style={{
             ...(dropUp ? { bottom: "calc(100% + 6px)" } : { top: "calc(100% + 6px)" }),
             background: SURFACE,
@@ -223,7 +223,7 @@ export default function FiltersBar({
 
   return (
     <div
-      className="rounded-2xl px-3 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-4 backdrop-blur-sm"
+      className="relative z-40 rounded-2xl px-3 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-4 backdrop-blur-sm"
       style={{
         background: `linear-gradient(135deg, ${ACCENT}60 0%, ${SURFACE}40 100%)`,
         border: `1px solid ${LINE}`,

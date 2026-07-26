@@ -270,7 +270,7 @@ Hyderabad Property Listings,Properties for Sale Hyderabad,
       </div>
 
       {/* ── Header ── */}
-      <section className="relative border-b pt-2 sm:pt-4 pb-8 sm:pb-12" style={{ borderColor: LINE }}>
+      <section className="relative z-30 border-b pt-2 sm:pt-4 pb-8 sm:pb-12" style={{ borderColor: LINE }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* Title + Sort: stacked on xs, side-by-side on sm+ */}
@@ -359,7 +359,7 @@ Hyderabad Property Listings,Properties for Sale Hyderabad,
       </section>
 
       {/* ── Property Cards ── */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
         {filtered.length === 0 ? (
           <div
             className="text-center py-12 sm:py-20 rounded-2xl sm:rounded-3xl"
